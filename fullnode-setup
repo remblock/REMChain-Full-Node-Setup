@@ -366,5 +366,6 @@ cd ~
 sudo apt autoremove -y
 sudo rm kibana-7.4.0-amd64.deb \
 eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb \
-remprotocol_0.2.1-1_amd64.deb
-echo "---SETUP COMPLETE---"
+remprotocol_0.3.0_amd64.deb
+
+echo "<---FULL NODE SETUP COMPLETE--->"
