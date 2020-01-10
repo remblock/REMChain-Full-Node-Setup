@@ -1,5 +1,13 @@
 #! /bin/bash
 
+#****************************************************************************************************#
+#                                            FULLNODE SETUP                                          #
+#****************************************************************************************************#
+
+#-----------------------------------------------------------------------------------------------------
+# RUNNING UPDATES AND INSTALLS                                                                       |
+#-----------------------------------------------------------------------------------------------------
+
 echo "<--- RUNNING UPDATES & INSTALLS --->"
 
 sudo apt update
@@ -11,26 +19,25 @@ sudo apt-get install jq -y
 sudo apt-get install unzip -y
 sudo apt-get install libwww-perl libdatetime-perl -y
 
-#-----------------------------------------------------
-# INSTALL REMNODE
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL REMNODE PROTOCOL                                                                           |
+#-----------------------------------------------------------------------------------------------------
 
-echo "<--- INSTALLING REMNODE --->"
+echo "<--- INSTALLING REMNODE PROTOCOL --->"
 
 cd ~
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.2.1/remprotocol_0.2.1-
-1_amd64.deb
-sudo apt install ./remprotocol_0.2.1-1_amd64.deb
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.0/remprotocol_0.3.0_amd64.deb
+sudo apt install ./remprotocol_0.3.0_amd64.deb
 
-#-----------------------------------------------------
-# FETCH GENESIS JSON
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# FETCHING GENESIS JSON                                                                              |
+#-----------------------------------------------------------------------------------------------------
 
 wget https://mainnet.remme.io/genesis.json
 
-#-----------------------------------------------------
-# SETUP CONFIG DIRECTORY
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# SETUP CONFIG DIRECTORY                                                                             |
+#-----------------------------------------------------------------------------------------------------
 
 mkdir -p ./config
 echo 'plugin = eosio::http_plugin
@@ -49,50 +56,50 @@ http-server-address = 0.0.0.0:8888
 p2p-listen-endpoint = 0.0.0.0:9876
 verbose-http-errors = true' > ./config/config.ini
 
-#-----------------------------------------------------
-# REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  |
+#-----------------------------------------------------------------------------------------------------
 
 cat /root/rem-utils/peer-lists/mainnet.ini >> /root/config/config.ini
 
-#-----------------------------------------------------
-# START REMNODE IN THE BACKGROUND
-#-----------------------------------------------------
-# If we need to delete all blocks: --delete-all-blocks --genesis-json /root/genesis.json
-#-----------------------------------------------------
-# If "database dirty flag set": --replay-blockchain --hard-replay-blockchain
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# START REMNODE IN THE BACKGROUND                                                                    |
+#-----------------------------------------------------------------------------------------------------
+# If we need to delete all blocks: --delete-all-blocks --genesis-json /root/genesis.json             |
+#-----------------------------------------------------------------------------------------------------
+# If "database dirty flag set": --replay-blockchain --hard-replay-blockchain                         |
+#-----------------------------------------------------------------------------------------------------
 
 remnode --config-dir /root/config/ --data-dir /data/rem/ --state-history-dir /data/rem/shpdata --
 disable-replay-opts >> /data/rem/remnode.log 2>&1 &
 
-#-----------------------------------------------------
-# INSTALL HYPERION HISTORY API
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL HYPERION HISTORY API                                                                       |
+#-----------------------------------------------------------------------------------------------------
+# https://github.com/eosrio/Hyperion-History-API/blob/master/INSTALL.md                              |
+#-----------------------------------------------------------------------------------------------------
 
-# https://github.com/eosrio/Hyperion-History-API/blob/master/INSTALL.md
-
-#-----------------------------------------------------
 echo "<---INSTALL HYPERION HISTORY API--->"
-#-----------------------------------------------------
-# INSTALL NODEJS
-#-----------------------------------------------------
+
+#-----------------------------------------------------------------------------------------------------
+# INSTALL NODEJS                                                                                     |
+#-----------------------------------------------------------------------------------------------------
 
 curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
-#-----------------------------------------------------
-# INSTALL PM2
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL PM2                                                                                        |
+#-----------------------------------------------------------------------------------------------------
 
 sudo npm install pm2@latest -g
 sudo pm2 startup
 
-#-----------------------------------------------------
-# INSTALL ELASTICSEARCH
-#-----------------------------------------------------
-# Test the REST API (curl http://localhost:9200)
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL ELASTICSEARCH                                                                              |
+#-----------------------------------------------------------------------------------------------------
+# Test the REST API (curl http://localhost:9200)                                                     |
+#-----------------------------------------------------------------------------------------------------
 
 wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 sudo apt-get install apt-transport-https
@@ -118,11 +125,11 @@ sudo systemctl daemon-reload
 sudo service elasticsearch start
 sudo systemctl enable elasticsearch
 
-#-----------------------------------------------------
-# INSTALL KIBANA
-#-----------------------------------------------------
-# Test the REST API (curl http://localhost:5601 -v)
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL KIBANA                                                                                     |
+#-----------------------------------------------------------------------------------------------------
+# Test the REST API (curl http://localhost:5601 -v)                                                  |
+#-----------------------------------------------------------------------------------------------------
 
 wget https://artifacts.elastic.co/downloads/kibana/kibana-7.4.0-amd64.deb
 sudo apt install ./kibana-7.4.0-amd64.deb
@@ -130,49 +137,48 @@ sudo /lib/systemd/systemd-sysv-install enable kibana
 sudo systemctl enable kibana
 sudo service kibana start
 
-#-----------------------------------------------------
-# INSTALL RABBITMQ
-#-----------------------------------------------------
-# Test the REST API (curl http://localhost:15672 -v)
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL RABBITMQ                                                                                   |
+#-----------------------------------------------------------------------------------------------------
+# Test the REST API (curl http://localhost:15672 -v)                                                 |
+#-----------------------------------------------------------------------------------------------------
 
 sudo apt-get install curl gnupg -y
 
-#-----------------------------------------------------
-# INSTALL RABBITMQ SIGNING KEY
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL RABBITMQ SIGNING KEY                                                                       |
+#-----------------------------------------------------------------------------------------------------
 
 curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-releasesigning-
 key.asc | sudo apt-key add -
 
-#-----------------------------------------------------
-# ADD BINTRAY REPOSITORIES THAT PROVISION LATEST
-# RABBITMQ AND ERLANG 21.c RELEASES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# ADD BINTRAY REPOSITORIES THAT PROVISION LATEST RABBITMQ AND ERLANG 21.c RELEASES                   |                                                   
+#-----------------------------------------------------------------------------------------------------
 
 sudo tee /etc/apt/sources.list.d/bintray.rabbitmq.list <<EOF
 
-#-----------------------------------------------------
-# INSTALLS THE LATEST ERLANG 21.x RELEASE
-#-----------------------------------------------------
-# Change Component To "erlang" To Install The Latest Version (22.x or later).
-# "bionic" As Distribution Name Should Work For Any Later Ubuntu Or Debian Release.
-# See The Release To Distribution Mapping Table In RabbitMQ Doc Guides To Learn More.
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALLS THE LATEST ERLANG 21.x RELEASE                                                            |
+#-----------------------------------------------------------------------------------------------------
+# Change Component To "erlang" To Install The Latest Version (22.x or later).                        |
+# "bionic" As Distribution Name Should Work For Any Later Ubuntu Or Debian Release.                  |
+# See The Release To Distribution Mapping Table In RabbitMQ Doc Guides To Learn More.                |
+#-----------------------------------------------------------------------------------------------------
 
 deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang-21.x
 deb https://dl.bintray.com/rabbitmq/debian bionic main
 EOF
 
-#-----------------------------------------------------
-# UPDATE PACKAGE INDICES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# UPDATE PACKAGE INDICES                                                                             |
+#-----------------------------------------------------------------------------------------------------
 
 sudo apt-get update -y
 
-#-----------------------------------------------------
-# INSTALL RABBITMQ-SERVER AND ITS DEPENDENCIES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL RABBITMQ-SERVER AND ITS DEPENDENCIES                                                       |
+#-----------------------------------------------------------------------------------------------------
 
 sudo apt-get install rabbitmq-server -y --fix-missing
 sudo service rabbitmq-server stop
@@ -189,17 +195,17 @@ sudo rabbitmqctl add_user ${hyperion_user} ${hyperion_pass}
 sudo rabbitmqctl set_user_tags ${hyperion_user} administrator
 sudo rabbitmqctl set_permissions -p /hyperion ${hyperion_user} ".*" ".*" ".*"
 
-#-----------------------------------------------------
-# INSTALL REDIS
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL REDIS                                                                                      |
+#-----------------------------------------------------------------------------------------------------
 
 sudo apt install redis-server -y
 sudo systemctl restart redis.service
 
-#-----------------------------------------------------
-# INSTALL HYPERION INDEXER
-# sudo pm2 logs
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL HYPERION INDEXER                                                                           |
+# sudo pm2 logs                                                                                      |
+#-----------------------------------------------------------------------------------------------------
 
 sudo chown -R $USER:$(id -gn $USER) ~/.config
 git clone https://github.com/Remmeauth/Hyperion-History-API.git
@@ -216,9 +222,9 @@ sed -i "s/SERVER_NAME:.*,/SERVER_NAME: 'rem.eon.llc',/" ecosystem.config.js
 sed -i "s/CHAIN:.*,/CHAIN: 'rem',/" ecosystem.config.js
 sed -i "s/ENABLE_CACHING: 'true',/ENABLE_CACHING: 'false',/" ecosystem.config.js
 
-#-----------------------------------------------------
-# NGINX REVERSE PROXY
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# NGINX REVERSE PROXY                                                                                |
+#-----------------------------------------------------------------------------------------------------
 
 echo "<--- NGINX REVERSE PROXY --->"
 sudo nginx -t
@@ -283,34 +289,33 @@ sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enable
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 
-#-----------------------------------------------------
-# INSTALL AND INIT SSL CERT
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# INSTALL AND INIT SSL CERTIFCATE                                                                    |
+#-----------------------------------------------------------------------------------------------------
 
-echo "<--- INSTALL AND INIT SSL CERT --->"
+echo "<--- INSTALL AND INIT SSL CERTIFCATE --->"
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot python-certbot-nginx -y
-sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains
-remblock1.io
+sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains remblock1.io
 sudo certbot renew --dry-run
 
-#-----------------------------------------------------
-# START PROCESSES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# START PROCESSES                                                                                    |
+#-----------------------------------------------------------------------------------------------------
 
-#-----------------------------------------------------
-# SET ENVIRONMENT VARIABLES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# SET ENVIRONMENT VARIABLES                                                                          |
+#-----------------------------------------------------------------------------------------------------
 
 nohup ~/history-tools/build/combo-rocksdb --rdb-database /data/rocksdb &> /dev/null &
 echo "<--- CREATING REBOOT INSTRUCTIONS --->"
 
-#-----------------------------------------------------
-# RESTART ALL PROCESSES ON REBOOT
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# RESTART ALL PROCESSES ON REBOOT                                                                    |
+#-----------------------------------------------------------------------------------------------------
 
 echo '#!/bin/bash
 sudo resize2fs /dev/nvme1n1
@@ -319,9 +324,9 @@ disable-replay-opts >> /data/rem/remnode.log 2>&1 &
 exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
-#-----------------------------------------------------
-# SET UP GRACEFUL SHUTDOWN
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# SET UP GRACEFUL SHUTDOWN                                                                           |
+#-----------------------------------------------------------------------------------------------------
 
 echo "<--- SET UP GRACEFUL SHUTDOWN --->"
 echo '#!/bin/sh
@@ -352,9 +357,9 @@ systemctl daemon-reload
 systemctl enable node_shutdown
 systemctl restart node_shutdown
 
-#-----------------------------------------------------
-# CLEANUP INSTALLATION FILES
-#-----------------------------------------------------
+#-----------------------------------------------------------------------------------------------------
+# CLEANUP INSTALLATION FILES                                                                         |
+#-----------------------------------------------------------------------------------------------------
 
 echo "<--- CLEANING INSTALLATION FILES --->"
 cd ~
