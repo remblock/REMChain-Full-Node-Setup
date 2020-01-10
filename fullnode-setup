@@ -33,7 +33,7 @@ sudo apt install ./remprotocol_0.3.0_amd64.deb
 # FETCHING GENESIS JSON                                                                              |
 #-----------------------------------------------------------------------------------------------------
 
-wget https://mainnet.remme.io/genesis.json
+wget https://remchain.remme.io/genesis.json
 
 #-----------------------------------------------------------------------------------------------------
 # SETUP CONFIG DIRECTORY                                                                             |
