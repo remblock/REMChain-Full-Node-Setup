@@ -313,6 +313,7 @@ sudo certbot renew --dry-run
 #-----------------------------------------------------------------------------------------------------
 
 nohup ~/history-tools/build/combo-rocksdb --rdb-database /data/rocksdb &> /dev/null &
+
 echo "<--- CREATING REBOOT INSTRUCTIONS --->"
 
 #-----------------------------------------------------------------------------------------------------
