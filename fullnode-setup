@@ -65,9 +65,9 @@ cat /root/rem-utils/peer-lists/mainnet.ini >> /root/config/config.ini
 #-----------------------------------------------------------------------------------------------------
 # START REMNODE IN THE BACKGROUND                                                                    |
 #-----------------------------------------------------------------------------------------------------
-# If we need to delete all blocks: --delete-all-blocks --genesis-json /root/genesis.json             |
+# If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           |
 #-----------------------------------------------------------------------------------------------------
-# If "database dirty flag set": --replay-blockchain --hard-replay-blockchain                         |
+# If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       |
 #-----------------------------------------------------------------------------------------------------
 
 remnode --config-dir /root/config/ --data-dir /data/rem/ --state-history-dir /data/rem/shpdata --
@@ -227,6 +227,7 @@ sed -i "s/ENABLE_CACHING: 'true',/ENABLE_CACHING: 'false',/" ecosystem.config.js
 #-----------------------------------------------------------------------------------------------------
 
 echo "<--- NGINX REVERSE PROXY --->"
+
 sudo nginx -t
 apt-get install nginx -y
 unlink /etc/nginx/sites-enabled/default
@@ -294,6 +295,7 @@ sudo systemctl enable nginx
 #-----------------------------------------------------------------------------------------------------
 
 echo "<--- INSTALL AND INIT SSL CERTIFCATE --->"
+
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
@@ -325,10 +327,11 @@ exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
 #-----------------------------------------------------------------------------------------------------
-# SET UP GRACEFUL SHUTDOWN                                                                           |
+# SETUP GRACEFUL SHUTDOWN                                                                            |
 #-----------------------------------------------------------------------------------------------------
 
-echo "<--- SET UP GRACEFUL SHUTDOWN --->"
+echo "<--- SETUP GRACEFUL SHUTDOWN --->"
+
 echo '#!/bin/sh
 remnode_pid=$(pgrep remnode)
 if [ ! -z "$remnode_pid" ]; then
