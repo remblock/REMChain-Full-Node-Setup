@@ -26,8 +26,8 @@ sudo apt-get install libwww-perl libdatetime-perl -y
 echo "<--- INSTALLING REMNODE PROTOCOL --->"
 
 cd ~
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.0/remprotocol_0.3.0_amd64.deb
-sudo apt install ./remprotocol_0.3.0_amd64.deb
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.1/remprotocol_0.3.1_amd64.deb
+sudo apt install ./remprotocol_0.3.1_amd64.deb
 
 #----------------------------------------------------------------------------------------------------#
 # FETCHING GENESIS JSON                                                                              #
@@ -60,7 +60,7 @@ verbose-http-errors = true' > ./config/config.ini
 # REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
 #----------------------------------------------------------------------------------------------------#
 
-cat /root/rem-utils/peer-lists/mainnet.ini >> /root/config/config.ini
+cat /root/remblock/peer-lists/mainnet.ini >> /root/config/config.ini
 
 #----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
@@ -216,9 +216,9 @@ cp example-connections.json connections.json
 sed -i '0,/name:/{s/"user":.*,/"user": "${hyperion_user}",/}' connections.json
 sed -i '0,/name:/{s/"pass":.*,/"pass": "${hyperion_pass}",/}' connections.json
 sed -i 's|"host": "157.245.232.171:9200",|"host": "127.0.0.1:9200",|' connections.json
-sed -i 's|"http": "https://testchain.remme.io",|"http": "http://127.0.0.1:8888",|' connections.json
-sed -i 's|"ship": "ws://testchain.remme.io"|"ship": "ws://127.0.0.1:8080"|' connections.json
-sed -i "s/SERVER_NAME:.*,/SERVER_NAME: 'rem.eon.llc',/" ecosystem.config.js
+sed -i 's|"http": "https://remchain.remme.io",|"http": "http://127.0.0.1:8888",|' connections.json
+sed -i 's|"ship": "ws://remchain.remme.io"|"ship": "ws://127.0.0.1:8080"|' connections.json
+sed -i "s/SERVER_NAME:.*,/SERVER_NAME: 'rem.remblock1.io',/" ecosystem.config.js
 sed -i "s/CHAIN:.*,/CHAIN: 'rem',/" ecosystem.config.js
 sed -i "s/ENABLE_CACHING: 'true',/ENABLE_CACHING: 'false',/" ecosystem.config.js
 
@@ -237,8 +237,8 @@ listen 80 default_server;
 listen [::]:80 default_server;
 server_name rem.eon.llc;
 client_max_body_size 500m;
-access_log /var/log/nginx/rem.eon.llc.access.log;
-error_log /var/log/nginx/rem.eon.llc.error.log;
+access_log /var/log/nginx/rem.remblock1.io.access.log;
+error_log /var/log/nginx/rem.remblock1.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -370,6 +370,6 @@ cd ~
 sudo apt autoremove -y
 sudo rm kibana-7.4.0-amd64.deb \
 eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb \
-remprotocol_0.3.0_amd64.deb
+remprotocol_0.3.1_amd64.deb
 
 echo "<---FULL NODE SETUP COMPLETE--->"
