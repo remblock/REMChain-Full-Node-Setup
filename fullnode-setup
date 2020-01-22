@@ -235,7 +235,7 @@ echo 'server {
 listen 443 ssl;
 listen 80 default_server;
 listen [::]:80 default_server;
-server_name rem.eon.llc;
+server_name rem.remblock1.io;
 client_max_body_size 500m;
 access_log /var/log/nginx/rem.remblock1.io.access.log;
 error_log /var/log/nginx/rem.remblock1.io.error.log;
@@ -366,6 +366,7 @@ systemctl restart node_shutdown
 #----------------------------------------------------------------------------------------------------#
 
 echo "<--- CLEANING INSTALLATION FILES --->"
+
 cd ~
 sudo apt autoremove -y
 sudo rm kibana-7.4.0-amd64.deb \
