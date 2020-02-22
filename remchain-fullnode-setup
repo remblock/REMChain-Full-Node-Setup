@@ -11,8 +11,8 @@
 create_data_dir="/root/data"
 create_rem_dir="/root/data/rem"
 create_config_dir="/root/config"
-create_rocksdb_dir="/root/rocksdb"
-create_shpdata_dir="/root/shpdata"
+create_rocksdb_dir="/root/data/rem/rocksdb"
+create_shpdata_dir="/root/data/rem/shpdata"
 config_file="/root/config/config.ini"
 remnode_log_file="/root/data/rem/remnode.log"
 
@@ -170,8 +170,8 @@ rm /root/mainnet.ini
 # If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
 #----------------------------------------------------------------------------------------------------#
 
-remnode --config-dir /root/config/ --data-dir /data/rem/ --state-history-dir /data/rem/shpdata --
-disable-replay-opts >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
+disable-replay-opts --genesis-json genesis.json >> $remnode_log_file 2>&1 &
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
@@ -272,7 +272,7 @@ sudo certbot renew --dry-run
 # SET ENVIRONMENT VARIABLES                                                                          #
 #----------------------------------------------------------------------------------------------------#
 
-nohup ~/history-tools/build/combo-rocksdb --rdb-database /data/rocksdb &> /dev/null &
+nohup ~/history-tools/build/combo-rocksdb --rdb-database $create_rocksdb_dir &> /dev/null &
 
 #----------------------------------------------------------------------------------------------------#
 # RESTART ALL PROCESSES ON REBOOT                                                                    #
@@ -280,8 +280,8 @@ nohup ~/history-tools/build/combo-rocksdb --rdb-database /data/rocksdb &> /dev/n
 
 echo '#!/bin/bash
 sudo resize2fs /dev/nvme1n1
-remnode --config-dir /root/config/ --data-dir /data/rem/ --state-history-dir /data/rem/shpdata --
-disable-replay-opts >> /data/rem/remnode.log 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
+disable-replay-opts >> $remnode_log_file 2>&1 &
 exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
