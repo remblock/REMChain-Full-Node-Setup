@@ -11,10 +11,11 @@
 create_data_dir="/root/data"
 create_rem_dir="/root/data/rem"
 create_config_dir="/root/config"
+config_file="/root/config/config.ini"
 create_rocksdb_dir="/root/data/rem/rocksdb"
 create_shpdata_dir="/root/data/rem/shpdata"
-config_file="/root/config/config.ini"
 remnode_log_file="/root/data/rem/remnode.log"
+genesis_json_file="/root/data/rem/genesis.json"
 
 #----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
@@ -121,12 +122,15 @@ apt install -y ./eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
+cd data
+cd rem
 wget https://remchain.remme.io/genesis.json
 
 #----------------------------------------------------------------------------------------------------#
 # SETUP CONFIG DIRECTORY                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
+cd ~
 mkdir -p ./config
 echo '
 #--------------------------------------------------#
@@ -171,7 +175,32 @@ rm /root/mainnet.ini
 #----------------------------------------------------------------------------------------------------#
 
 remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
-disable-replay-opts --genesis-json genesis.json >> $remnode_log_file 2>&1 &
+disable-replay-opts --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
+
+sleep 7
+
+while [ : ]
+do
+	systemdt=$(date '+%Y-%m-%dT%H:%M')
+
+	if [ "$dt1" == "$systemdt" ] 
+  then
+		break
+	else
+		dt1=$(remcli get info | grep head_block_time | cut -c 23-38)
+		dt1date=$(echo $dt1 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+		dt1time=$(echo $dt1 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+
+		dt2=$(tail -n 1 remnode.log | awk '{print $2}'| awk -F'.' '{print $1}')
+		dt2date=$(echo $dt2 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+		dt2time=$(echo $dt2 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+
+		echo "Fetching blocks for [${dt1date} | ${dt1time}] | Current block date [${dt2date} | ${dt2time}]"
+	fi
+
+	echo ""
+	sleep 2
+done
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
@@ -279,9 +308,17 @@ nohup ~/history-tools/build/combo-rocksdb --rdb-database $create_rocksdb_dir &> 
 #----------------------------------------------------------------------------------------------------#
 
 echo '#!/bin/bash
+
+create_rem_dir="/root/data/rem"
+create_config_dir="/root/config"
+create_shpdata_dir="/root/data/rem/shpdata"
+remnode_log_file="/root/data/rem/remnode.log"
+
 sudo resize2fs /dev/nvme1n1
+
 remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
 disable-replay-opts >> $remnode_log_file 2>&1 &
+
 exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
