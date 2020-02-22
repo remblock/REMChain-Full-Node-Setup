@@ -8,8 +8,6 @@
 # RUNNING UPDATES AND INSTALLS                                                                       #
 #----------------------------------------------------------------------------------------------------#
 
-echo "<--- RUNNING UPDATES & INSTALLS --->"
-
 sudo -S apt update && sudo -S apt upgrade -y
 sudo apt install python-pip -y
 sudo apt install python-psycopg2 -y
@@ -21,8 +19,6 @@ sudo apt-get install libwww-perl libdatetime-perl -y
 #----------------------------------------------------------------------------------------------------#
 # INSTALL REMNODE PROTOCOL                                                                           #
 #----------------------------------------------------------------------------------------------------#
-
-echo "<--- INSTALLING REMNODE PROTOCOL --->"
 
 cd ~
 wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
@@ -77,8 +73,6 @@ disable-replay-opts >> /data/rem/remnode.log 2>&1 &
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
 #----------------------------------------------------------------------------------------------------#
-
-echo "<--- NGINX REVERSE PROXY --->"
 
 sudo nginx -t
 apt-get install nginx -y
@@ -146,8 +140,6 @@ sudo systemctl enable nginx
 # INSTALL AND INIT SSL CERTIFCATE                                                                    #
 #----------------------------------------------------------------------------------------------------#
 
-echo "<--- INSTALL AND INIT SSL CERTIFCATE --->"
-
 sudo apt-get install software-properties-common -y
 sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
@@ -166,8 +158,6 @@ sudo certbot renew --dry-run
 
 nohup ~/history-tools/build/combo-rocksdb --rdb-database /data/rocksdb &> /dev/null &
 
-echo "<--- CREATING REBOOT INSTRUCTIONS --->"
-
 #----------------------------------------------------------------------------------------------------#
 # RESTART ALL PROCESSES ON REBOOT                                                                    #
 #----------------------------------------------------------------------------------------------------#
@@ -182,8 +172,6 @@ sudo chmod +x /etc/rc.local
 #----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
 #----------------------------------------------------------------------------------------------------#
-
-echo "<--- SETUP GRACEFUL SHUTDOWN --->"
 
 echo '#!/bin/sh
 remnode_pid=$(pgrep remnode)
@@ -216,8 +204,6 @@ systemctl restart node_shutdown
 #----------------------------------------------------------------------------------------------------#
 # CLEANUP INSTALLATION FILES                                                                         #
 #----------------------------------------------------------------------------------------------------#
-
-echo "<--- CLEANING INSTALLATION FILES --->"
 
 cd ~
 sudo apt autoremove -y
