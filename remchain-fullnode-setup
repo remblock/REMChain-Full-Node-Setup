@@ -177,7 +177,7 @@ rm /root/mainnet.ini
 remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
 disable-replay-opts --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
 
-sleep 7
+sleep 4
 
 while [ : ]
 do
