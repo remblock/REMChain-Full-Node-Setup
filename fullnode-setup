@@ -148,9 +148,9 @@ sudo apt-get install certbot python-certbot-nginx -y
 sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains remblock1.io
 sudo certbot renew --dry-run
 
-#----------------------------------------------------------------------------------------------------#
-# START PROCESSES                                                                                    #
-#----------------------------------------------------------------------------------------------------#
+#****************************************************************************************************#
+#                                     STARTING FULL NODE PROCESSES                                   #
+#****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
 # SET ENVIRONMENT VARIABLES                                                                          #
@@ -211,4 +211,5 @@ sudo rm kibana-7.4.0-amd64.deb \
 eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb \
 remprotocol_0.4.1.amd64.deb
 
+echo ""
 echo "<---FULL NODE SETUP COMPLETE--->"
