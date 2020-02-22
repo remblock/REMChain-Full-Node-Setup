@@ -58,7 +58,7 @@ wget https://remchain.remme.io/genesis.json
 mkdir -p ./config
 echo '
 #--------------------------------------------------#
-# ���������������FULL NODE CONFIG PLUGINS                         #
+# FULL NODE CONFIG PLUGINS                         #
 #--------------------------------------------------#
 
 plugin = eosio::http_plugin
