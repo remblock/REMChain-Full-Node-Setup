@@ -9,6 +9,7 @@
 #----------------------------------------------------------------------------------------------------#
 
 create_data_dir="/root/data"
+create_rem_dir="/root/data/rem"
 create_config_dir="/root/config"
 config_file="/root/config/config.ini"
 remnode_log_file="/root/data/rem/remnode.log"
@@ -20,6 +21,7 @@ remnode_log_file="/root/data/rem/remnode.log"
 if [ ! -d "$create_data_dir" && "$create_config_dir" ]
 then
   mkdir -p "$create_data_dir"
+  mkdir -p "$create_rem_dir"
   mkdir -p "$create_config_dir"
 fi
 
@@ -88,7 +90,7 @@ rm /root/mainnet.ini
 #----------------------------------------------------------------------------------------------------#
 
 remnode --config-dir /root/config/ --data-dir /data/rem/ --state-history-dir /data/rem/shpdata --
-disable-replay-opts >> /data/rem/remnode.log 2>&1 &
+disable-replay-opts >> $remnode_log_file 2>&1 &
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
