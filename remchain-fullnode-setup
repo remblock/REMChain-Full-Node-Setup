@@ -5,6 +5,25 @@
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
+# CONFIGURATION VARIABLES                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+create_data_dir="/root/data"
+create_config_dir="/root/config"
+config_file="/root/config/config.ini"
+remnode_log_file="/root/data/rem/remnode.log"
+
+#----------------------------------------------------------------------------------------------------#
+# CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -d "$create_data_dir" && "$create_config_dir" ]
+then
+  mkdir -p "$create_data_dir"
+  mkdir -p "$create_config_dir"
+fi
+
+#----------------------------------------------------------------------------------------------------#
 # RUNNING UPDATES AND INSTALLS                                                                       #
 #----------------------------------------------------------------------------------------------------#
 
@@ -49,7 +68,8 @@ chain-state-db-size-mb = 100480
 http-validate-host = false
 http-server-address = 0.0.0.0:8888
 p2p-listen-endpoint = 0.0.0.0:9876
-verbose-http-errors = true' > ./config/config.ini
+verbose-http-errors = true
+' > ./config/config.ini
 
 #----------------------------------------------------------------------------------------------------#
 # REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
