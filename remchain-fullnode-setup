@@ -322,9 +322,10 @@ systemctl restart node_shutdown
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
-sudo apt autoremove -y
-remprotocol_0.4.1.amd64.deb \
-eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
-
+rm boost_1_70_0.tar.gz
+rm cmake-3.14.5.tar.gz
+rm remprotocol_0.4.1.amd64.deb 
+rm eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 echo ""
 echo "<---FULL NODE SETUP COMPLETE--->"
+echo ""
