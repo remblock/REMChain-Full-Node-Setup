@@ -131,7 +131,6 @@ wget https://remchain.remme.io/genesis.json
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
-mkdir -p ./config
 echo '#--------------------------------------------------#
 # FULL NODE CONFIG PLUGINS                         #
 #--------------------------------------------------#
@@ -173,8 +172,8 @@ rm /root/mainnet.ini
 # If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
 #----------------------------------------------------------------------------------------------------#
 
-remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
-disable-replay-opts --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
+cd ~
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
 
 sleep 4
 
