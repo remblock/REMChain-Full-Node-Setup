@@ -29,13 +29,52 @@ fi
 # RUNNING UPDATES AND INSTALLS                                                                       #
 #----------------------------------------------------------------------------------------------------#
 
-sudo -S apt update && sudo -S apt upgrade -y
-sudo apt install python-pip -y
-sudo apt install python-psycopg2 -y
-sudo pip install requests
-sudo apt-get install jq -y
-sudo apt-get install unzip -y
-sudo apt-get install libwww-perl libdatetime-perl -y
+sudo -S apt update && sudo -S apt upgrade -y \
+    autoconf2.13        \
+    build-essential     \
+    bzip2               \
+    cargo               \
+    clang-8             \
+    git                 \
+    libgmp-dev          \
+    libpq-dev           \
+    lld-8               \
+    lldb-8              \
+    ninja-build         \
+    nodejs              \
+    npm                 \
+    pkg-config          \
+    postgresql-server-dev-all \
+    python2.7-dev       \
+    python3-dev         \
+    rustc               \
+    zlib1g-dev
+    
+update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
+update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
+tar xf boost_1_70_0.tar.gz
+cd boost_1_70_0
+./bootstrap.sh
+./b2 toolset=clang -j10 install
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz
+tar xf cmake-3.14.5.tar.gz
+cd cmake-3.14.5
+./bootstrap --parallel=10
+make -j10
+make -j10 install
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALL REMNODE PROTOCOL                                                                           #
@@ -46,9 +85,26 @@ wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotoco
 sudo apt install ./remprotocol_0.4.1.amd64.deb
 
 #----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/EOSIO/eos/releases/download/v1.8.1/eosio_1.8.1-1-ubuntu-18.04_amd64.deb
+apt install -y ./eosio_1.8.1-1-ubuntu-18.04_amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/EOSIO/eosio.cdt/releases/download/v1.6.2/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+apt install -y ./eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
 # FETCHING GENESIS JSON                                                                              #
 #----------------------------------------------------------------------------------------------------#
 
+cd ~
 wget https://remchain.remme.io/genesis.json
 
 #----------------------------------------------------------------------------------------------------#
