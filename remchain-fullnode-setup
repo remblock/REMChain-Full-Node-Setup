@@ -161,6 +161,19 @@ disable-replay-opts >> $remnode_log_file 2>&1 &
 # NGINX REVERSE PROXY                                                                                #
 #----------------------------------------------------------------------------------------------------#
 
+cd ~
+git clone --recursive https://github.com/EOSIO/history-tools.git
+cd history-tools
+mkdir build
+cd build
+cmake -GNinja -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_C_COMPILER=clang-8 ..
+bash -c "cd ../src && npm install node-fetch"
+ninja
+
+#----------------------------------------------------------------------------------------------------#
+# NGINX REVERSE PROXY                                                                                #
+#----------------------------------------------------------------------------------------------------#
+
 sudo nginx -t
 apt-get install nginx -y
 unlink /etc/nginx/sites-enabled/default
@@ -295,8 +308,8 @@ systemctl restart node_shutdown
 cd ~
 sudo apt autoremove -y
 sudo rm kibana-7.4.0-amd64.deb \
-eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb \
-remprotocol_0.4.1.amd64.deb
+remprotocol_0.4.1.amd64.deb \
+eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 
 echo ""
 echo "<---FULL NODE SETUP COMPLETE--->"
