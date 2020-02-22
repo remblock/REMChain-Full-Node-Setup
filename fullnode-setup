@@ -10,8 +10,7 @@
 
 echo "<--- RUNNING UPDATES & INSTALLS --->"
 
-sudo apt update
-sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y
+sudo -S apt update && sudo -S apt upgrade -y
 sudo apt install python-pip -y
 sudo apt install python-psycopg2 -y
 sudo pip install requests
@@ -26,8 +25,8 @@ sudo apt-get install libwww-perl libdatetime-perl -y
 echo "<--- INSTALLING REMNODE PROTOCOL --->"
 
 cd ~
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.3.1/remprotocol_0.3.1_amd64.deb
-sudo apt install ./remprotocol_0.3.1_amd64.deb
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
+sudo apt install ./remprotocol_0.4.1.amd64.deb
 
 #----------------------------------------------------------------------------------------------------#
 # FETCHING GENESIS JSON                                                                              #
@@ -60,7 +59,9 @@ verbose-http-errors = true' > ./config/config.ini
 # REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
 #----------------------------------------------------------------------------------------------------#
 
-cat /root/remblock/peer-lists/mainnet.ini >> /root/config/config.ini
+wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
+cat /root/mainnet.ini >> /root/config/config.ini
+rm /root/mainnet.ini
 
 #----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
