@@ -35,7 +35,7 @@ fi
 wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
 cat /root/config.ini > /root/config/config.ini
 rm /root/config.ini
-
+echo "" >> /root/config/config.ini
 wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
 cat /root/mainnet.ini >> /root/config/config.ini
 rm /root/mainnet.ini
