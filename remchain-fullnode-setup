@@ -23,7 +23,6 @@ remnode_log_file="/root/data/rem/remnode.log"
 if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" ]
 then
   mkdir -p "$create_data_dir"
-  mkdir -p "$create_rem_dir"
   mkdir -p "$create_config_dir"
   mkdir -p "$create_rocksdb_dir"
   mkdir -p "$create_shpdata_dir"
@@ -88,7 +87,7 @@ wget https://remchain.remme.io/genesis.json
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
-remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
 
 sleep 4
 
@@ -117,7 +116,7 @@ sleep 2
 done
 
 #----------------------------------------------------------------------------------------------------#
-# RUNNING UPDATES AND INSTALLS                                                                       #
+# INSTALL CLANG 8 AND OTHER NEEDED TOOLS                                                             #
 #----------------------------------------------------------------------------------------------------#
 
 apt update && apt install -y wget gnupg
@@ -157,7 +156,7 @@ update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
 update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
 
 #----------------------------------------------------------------------------------------------------#
-# INSTALL BOOST                                                                                      #
+# INSTALL BOOST 1.70                                                                                 #
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
@@ -168,7 +167,7 @@ cd boost_1_70_0
 ./b2 toolset=clang -j10 install
 
 #----------------------------------------------------------------------------------------------------#
-# INSTALL CMAKE                                                                                      #
+# INSTALL CMAKE 3.14.5                                                                               #
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
@@ -180,23 +179,7 @@ make -j10
 make -j10 install
 
 #----------------------------------------------------------------------------------------------------#
-# INSTALL REMNODE PROTOCOL                                                                           #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
-sudo apt install ./remprotocol_0.4.1.amd64.deb
-
-#----------------------------------------------------------------------------------------------------#
-# INSTALL EOSIO PROTOCOL                                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-wget https://github.com/EOSIO/eos/releases/download/v1.8.1/eosio_1.8.1-1-ubuntu-18.04_amd64.deb
-apt install -y ./eosio_1.8.1-1-ubuntu-18.04_amd64.deb
-
-#----------------------------------------------------------------------------------------------------#
-# INSTALL REMNODE PROTOCOL                                                                           #
+# INSTALL EOSIO CDT 1.6.2                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
