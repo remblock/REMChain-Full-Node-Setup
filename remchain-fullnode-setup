@@ -62,7 +62,7 @@ wget https://remchain.remme.io/genesis.json
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 
 sleep 4
 
