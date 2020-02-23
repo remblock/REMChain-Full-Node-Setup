@@ -32,34 +32,9 @@ fi
 # SETUP CONFIG DIRECTORY                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
-echo '#--------------------------------------------------#
-# FULL NODE CONFIG PLUGINS                         #
-#--------------------------------------------------#
-
-plugin = eosio::http_plugin
-plugin = eosio::chain_plugin
-plugin = eosio::chain_api_plugin
-plugin = eosio::net_api_plugin
-plugin = eosio::state_history_plugin --disable-replay-opts
-state-history-dir = "/data/rem/shpdata"
-trace-history = true
-chain-state-history = true
-state-history-endpoint = 0.0.0.0:8080
-abi-serializer-max-time-ms = 15000
-chain-state-db-size-mb = 100480
-http-validate-host = false
-http-server-address = 0.0.0.0:8888
-p2p-listen-endpoint = 0.0.0.0:9876
-verbose-http-errors = true
-
-#--------------------------------------------------#
-# REMCHAIN MAINNET PEER LIST                       #
-#--------------------------------------------------#
-' > ./config/config.ini
-
-#----------------------------------------------------------------------------------------------------#
-# REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
-#----------------------------------------------------------------------------------------------------#
+wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
+cat /root/config.ini > /root/config/config.ini
+rm /root/config.ini
 
 wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
 cat /root/mainnet.ini >> /root/config/config.ini
