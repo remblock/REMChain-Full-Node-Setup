@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #****************************************************************************************************#
-#                                            FULLNODE SETUP                                          #
+#                                           FULLNODE SETUP                                           #
 #****************************************************************************************************#
 
 #----------------------------------------------------------------------------------------------------#
@@ -9,13 +9,12 @@
 #----------------------------------------------------------------------------------------------------#
 
 create_data_dir="/root/data"
-create_rem_dir="/root/data/rem"
 create_config_dir="/root/config"
 config_file="/root/config/config.ini"
-create_rocksdb_dir="/root/data/rem/rocksdb"
-create_shpdata_dir="/root/data/rem/shpdata"
+genesis_json_file="/root/genesis.json"
+create_rocksdb_dir="/root/data/rocksdb"
+create_shpdata_dir="/root/data/shpdata"
 remnode_log_file="/root/data/rem/remnode.log"
-genesis_json_file="/root/data/rem/genesis.json"
 
 #----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
@@ -29,6 +28,93 @@ then
   mkdir -p "$create_rocksdb_dir"
   mkdir -p "$create_shpdata_dir"
 fi
+
+#----------------------------------------------------------------------------------------------------#
+# SETUP CONFIG DIRECTORY                                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+echo '#--------------------------------------------------#
+# FULL NODE CONFIG PLUGINS                         #
+#--------------------------------------------------#
+
+plugin = eosio::http_plugin
+plugin = eosio::chain_plugin
+plugin = eosio::chain_api_plugin
+plugin = eosio::net_api_plugin
+plugin = eosio::state_history_plugin --disable-replay-opts
+state-history-dir = "/data/rem/shpdata"
+trace-history = true
+chain-state-history = true
+state-history-endpoint = 0.0.0.0:8080
+abi-serializer-max-time-ms = 15000
+chain-state-db-size-mb = 100480
+http-validate-host = false
+http-server-address = 0.0.0.0:8888
+p2p-listen-endpoint = 0.0.0.0:9876
+verbose-http-errors = true
+
+#--------------------------------------------------#
+# REMCHAIN MAINNET PEER LIST                       #
+#--------------------------------------------------#
+' > ./config/config.ini
+
+#----------------------------------------------------------------------------------------------------#
+# REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
+cat /root/mainnet.ini >> /root/config/config.ini
+rm /root/mainnet.ini
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
+sudo apt install ./remprotocol_0.4.1.amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
+# FETCHING GENESIS JSON                                                                              #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://remchain.remme.io/genesis.json
+
+#----------------------------------------------------------------------------------------------------#
+# START REMNODE IN THE BACKGROUND                                                                    #
+#----------------------------------------------------------------------------------------------------#
+# If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           #
+#----------------------------------------------------------------------------------------------------#
+# If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
+
+sleep 4
+
+while [ : ]
+do
+
+systemdt=$(date '+%Y-%m-%dT%H:%M')
+
+if [ "$dt1" == "$systemdt" ] 
+then
+  break
+else
+  dt1=$(remcli get info | grep head_block_time | cut -c 23-38)
+  dt1date=$(echo $dt1 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+  dt1time=$(echo $dt1 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+  dt2=$(tail -n 1 $remnode_log_file | awk '{print $2}'| awk -F'.' '{print $1}')
+  dt2date=$(echo $dt2 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+  dt2time=$(echo $dt2 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+
+  echo "Fetching blocks for [${dt1date} | ${dt1time}] | Current block date [${dt2date} | ${dt2time}]"
+fi
+
+echo ""
+sleep 2
+
+done
 
 #----------------------------------------------------------------------------------------------------#
 # RUNNING UPDATES AND INSTALLS                                                                       #
@@ -116,90 +202,6 @@ apt install -y ./eosio_1.8.1-1-ubuntu-18.04_amd64.deb
 cd ~
 wget https://github.com/EOSIO/eosio.cdt/releases/download/v1.6.2/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 apt install -y ./eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
-
-#----------------------------------------------------------------------------------------------------#
-# FETCHING GENESIS JSON                                                                              #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-cd data
-cd rem
-wget https://remchain.remme.io/genesis.json
-
-#----------------------------------------------------------------------------------------------------#
-# SETUP CONFIG DIRECTORY                                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-echo '#--------------------------------------------------#
-# FULL NODE CONFIG PLUGINS                         #
-#--------------------------------------------------#
-
-plugin = eosio::http_plugin
-plugin = eosio::chain_plugin
-plugin = eosio::chain_api_plugin
-plugin = eosio::net_api_plugin
-plugin = eosio::state_history_plugin --disable-replay-opts
-state-history-dir = "/data/rem/shpdata"
-trace-history = true
-chain-state-history = true
-state-history-endpoint = 0.0.0.0:8080
-abi-serializer-max-time-ms = 15000
-chain-state-db-size-mb = 100480
-http-validate-host = false
-http-server-address = 0.0.0.0:8888
-p2p-listen-endpoint = 0.0.0.0:9876
-verbose-http-errors = true
-
-#--------------------------------------------------#
-# REMCHAIN MAINNET PEER LIST                       #
-#--------------------------------------------------#
-' > ./config/config.ini
-
-#----------------------------------------------------------------------------------------------------#
-# REMOVE SELF FROM PEERS BEFORE APPENDING TO CONFIG                                                  #
-#----------------------------------------------------------------------------------------------------#
-
-wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
-cat /root/mainnet.ini >> /root/config/config.ini
-rm /root/mainnet.ini
-
-#----------------------------------------------------------------------------------------------------#
-# START REMNODE IN THE BACKGROUND                                                                    #
-#----------------------------------------------------------------------------------------------------#
-# If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           #
-#----------------------------------------------------------------------------------------------------#
-# If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file >> $remnode_log_file 2>&1 &
-
-sleep 4
-
-while [ : ]
-do
-
-systemdt=$(date '+%Y-%m-%dT%H:%M')
-
-if [ "$dt1" == "$systemdt" ] 
-then
-  break
-else
-  dt1=$(remcli get info | grep head_block_time | cut -c 23-38)
-  dt1date=$(echo $dt1 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
-  dt1time=$(echo $dt1 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
-  dt2=$(tail -n 1 $remnode_log_file | awk '{print $2}'| awk -F'.' '{print $1}')
-  dt2date=$(echo $dt2 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
-  dt2time=$(echo $dt2 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
-
-  echo "Fetching blocks for [${dt1date} | ${dt1time}] | Current block date [${dt2date} | ${dt2time}]"
-fi
-
-echo ""
-sleep 2
-
-done
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
