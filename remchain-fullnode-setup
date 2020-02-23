@@ -10,11 +10,11 @@
 
 create_data_dir="/root/data"
 create_config_dir="/root/config"
+remnode_log_file="/root/remnode.log"
 config_file="/root/config/config.ini"
 genesis_json_file="/root/genesis.json"
 create_rocksdb_dir="/root/data/rocksdb"
 create_shpdata_dir="/root/data/shpdata"
-remnode_log_file="/root/data/rem/remnode.log"
 
 #----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
