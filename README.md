@@ -1,6 +1,6 @@
 # REMChain-Full-Node-Setup - (Ubuntu 18.04)
 
-#### This script will help block producer setup their full node, by automating the entire process.
+#### This script will help block producers setup their full node, by automating the entire process.
 
 ***
 
