@@ -265,10 +265,10 @@ nohup ~/history-tools/build/combo-rocksdb --rdb-database $create_rocksdb_dir &> 
 
 echo '#!/bin/bash
 
-create_rem_dir="/root/data/rem"
+create_rem_dir="/root/data"
 create_config_dir="/root/config"
-create_shpdata_dir="/root/data/rem/shpdata"
-remnode_log_file="/root/data/rem/remnode.log"
+create_shpdata_dir="/root/data/shpdata"
+remnode_log_file="/root/remnode.log"
 
 sudo resize2fs /dev/nvme1n1
 
