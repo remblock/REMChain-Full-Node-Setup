@@ -175,7 +175,7 @@ ninja
 # NGINX REVERSE PROXY                                                                                #
 #----------------------------------------------------------------------------------------------------#
 
-sudo nginx -t
+cd ~
 apt-get install nginx -y
 unlink /etc/nginx/sites-enabled/default
 echo 'server {
