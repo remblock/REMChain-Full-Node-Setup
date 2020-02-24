@@ -81,7 +81,7 @@ bin_file=$create_snapshot_dir/*.bin
 # If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
 #----------------------------------------------------------------------------------------------------#
 
-#cd ~
+cd ~
 #remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 #sleep 4
 
@@ -89,16 +89,18 @@ bin_file=$create_snapshot_dir/*.bin
 # GRACEFULLY STOP REMNODE                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-#remnode_pid=$(pgrep remnode)
+remnode_pid=$(pgrep remnode)
 
-#if [ ! -z "$remnode_pid" ]; then
-#    if ps -p $remnode_pid > /dev/null; then
-#        kill -SIGINT $remnode_pid
-#    fi
-#    while ps -p $remnode_pid > /dev/null; do
-#        sleep 1
-#    done
-#fi
+if [ ! -z "$remnode_pid" ]; 
+then
+  if ps -p $remnode_pid > /dev/null; 
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
+fi
 
 #----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
