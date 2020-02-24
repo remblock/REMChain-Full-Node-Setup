@@ -7,5 +7,5 @@
 ### Setup REMChain-Full-Node:
 
 ```
-sudo wget https://github.com/remblock/REMChain-Full-Node/raw/master/remchain-fullnode-setup && sudo chmod u+x remchain-fullnode-setup && sudo ./remchain-fullnode-setup
+sudo wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/remchain-fullnode-setup && sudo chmod u+x remchain-fullnode-setup && sudo ./remchain-fullnode-setup
 ```
