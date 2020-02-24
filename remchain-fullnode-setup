@@ -9,23 +9,33 @@
 #----------------------------------------------------------------------------------------------------#
 
 create_data_dir="/root/data"
+state_dir="/root/data/state"
+blocks_dir="/root/data/blocks"
 create_config_dir="/root/config"
 remnode_log_file="/root/remnode.log"
 config_file="/root/config/config.ini"
 genesis_json_file="/root/genesis.json"
 create_rocksdb_dir="/root/data/rocksdb"
 create_shpdata_dir="/root/data/shpdata"
+create_snapshot_dir="/root/data/snapshots"
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMCHAIN SNAPSHOT DEPENDENCIES                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+sudo apt-get install jq -y
 
 #----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" ]
+if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
 then
   mkdir -p "$create_data_dir"
   mkdir -p "$create_config_dir"
   mkdir -p "$create_rocksdb_dir"
   mkdir -p "$create_shpdata_dir"
+  mkdir -p "$create_snapshot_dir"
 fi
 
 #----------------------------------------------------------------------------------------------------#
@@ -54,6 +64,15 @@ sudo apt install ./remprotocol_0.4.1.amd64.deb
 wget https://remchain.remme.io/genesis.json
 
 #----------------------------------------------------------------------------------------------------#
+# SETUP REMNODE SNAPSHOT                                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+rm -f *.bin
+latest_snapshot=$(curl -s https://geordier.co.uk/snapshots/latestsnapshot.php)
+wget -c https://www.geordier.co.uk/snapshots/$latest_snapshot -O - | sudo tar -xz --strip=4
+bin_file=$create_snapshot_dir/*.bin
+
+#----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
 #----------------------------------------------------------------------------------------------------#
 # If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           #
@@ -61,7 +80,7 @@ wget https://remchain.remme.io/genesis.json
 # If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
 #----------------------------------------------------------------------------------------------------#
 
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --snapshot $bin_file --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 
 sleep 4
 
