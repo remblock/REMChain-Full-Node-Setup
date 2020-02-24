@@ -74,7 +74,7 @@ wget -c https://www.geordier.co.uk/snapshots/$latest_snapshot -O - | sudo tar -x
 bin_file=$create_snapshot_dir/*.bin
 
 #----------------------------------------------------------------------------------------------------#
-# START REMNODE IN THE BACKGROUND                                                                    #
+# START REMNODE FOR THE FIRST TIME                                                                   #
 #----------------------------------------------------------------------------------------------------#
 # If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           #
 #----------------------------------------------------------------------------------------------------#
@@ -83,6 +83,26 @@ bin_file=$create_snapshot_dir/*.bin
 
 remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 sleep 4
+
+#----------------------------------------------------------------------------------------------------#
+# GRACEFULLY STOP REMNODE                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ]; then
+    if ps -p $remnode_pid > /dev/null; then
+        kill -SIGINT $remnode_pid
+    fi
+    while ps -p $remnode_pid > /dev/null; do
+        sleep 1
+    done
+fi
+
+#----------------------------------------------------------------------------------------------------#
+# START REMNODE IN THE BACKGROUND                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
 remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --snapshot $bin_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 sleep 4
 
