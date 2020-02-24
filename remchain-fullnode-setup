@@ -272,8 +272,7 @@ remnode_log_file="/root/remnode.log"
 
 sudo resize2fs /dev/nvme1n1
 
-remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --
-disable-replay-opts >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
 
 exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
