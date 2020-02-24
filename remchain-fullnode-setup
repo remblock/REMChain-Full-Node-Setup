@@ -89,19 +89,6 @@ cd ~
 # GRACEFULLY STOP REMNODE                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-remnode_pid=$(pgrep remnode)
-
-if [ ! -z "$remnode_pid" ]; 
-then
-  if ps -p $remnode_pid > /dev/null; 
-  then
-    kill -SIGINT $remnode_pid
-  fi
-  while ps -p $remnode_pid > /dev/null; do
-    sleep 1
-  done
-fi
-
 #----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
 #----------------------------------------------------------------------------------------------------#
@@ -139,13 +126,15 @@ done
 
 remnode_pid=$(pgrep remnode)
 
-if [ ! -z "$remnode_pid" ]; then
-    if ps -p $remnode_pid > /dev/null; then
-        kill -SIGINT $remnode_pid
-    fi
-    while ps -p $remnode_pid > /dev/null; do
-        sleep 1
-    done
+if [ ! -z "$remnode_pid" ]; 
+then
+  if ps -p $remnode_pid > /dev/null; 
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
 fi
 
 remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
