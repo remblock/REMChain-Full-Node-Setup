@@ -314,7 +314,6 @@ systemctl restart node_shutdown
 # CLEANUP INSTALLATION FILES                                                                         #
 #----------------------------------------------------------------------------------------------------#
 
-cd ~
 rm boost_1_70_0.tar.gz
 rm cmake-3.14.5.tar.gz
 rm remprotocol_0.4.1.amd64.deb 
