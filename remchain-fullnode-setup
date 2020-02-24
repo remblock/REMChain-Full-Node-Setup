@@ -184,8 +184,8 @@ listen 80 default_server;
 listen [::]:80 default_server;
 server_name api.remblock1.io;
 client_max_body_size 500m;
-access_log /var/log/nginx/rem.remblock1.io.access.log;
-error_log /var/log/nginx/rem.remblock1.io.error.log;
+access_log /var/log/nginx/api.remblock1.io.access.log;
+error_log /var/log/nginx/api.remblock1.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
