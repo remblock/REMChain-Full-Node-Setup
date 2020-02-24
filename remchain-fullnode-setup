@@ -182,7 +182,7 @@ echo 'server {
 listen 443 ssl;
 listen 80 default_server;
 listen [::]:80 default_server;
-server_name rem.remblock1.io;
+server_name api.remblock1.io;
 client_max_body_size 500m;
 access_log /var/log/nginx/rem.remblock1.io.access.log;
 error_log /var/log/nginx/rem.remblock1.io.error.log;
