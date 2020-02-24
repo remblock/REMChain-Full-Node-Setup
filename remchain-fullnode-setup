@@ -67,8 +67,9 @@ wget https://remchain.remme.io/genesis.json
 # SETUP REMNODE SNAPSHOT                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
-rm -f *.bin
+rm -f $create_snapshot_dir/*.bin
 latest_snapshot=$(curl -s https://geordier.co.uk/snapshots/latestsnapshot.php)
+cd $create_snapshot_dir
 wget -c https://www.geordier.co.uk/snapshots/$latest_snapshot -O - | sudo tar -xz --strip=4
 bin_file=$create_snapshot_dir/*.bin
 
