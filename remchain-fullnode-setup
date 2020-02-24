@@ -300,6 +300,18 @@ sudo systemctl restart nginx
 sudo systemctl enable nginx
 
 #----------------------------------------------------------------------------------------------------#
+# INSTALL AND INIT SSL CERTIFCATE                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot -y
+sudo apt-get update
+sudo apt-get install certbot python-certbot-nginx -y
+sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains api.remblock1.io
+sudo certbot renew --dry-run
+
+#----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
