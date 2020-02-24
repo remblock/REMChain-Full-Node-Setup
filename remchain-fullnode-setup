@@ -81,6 +81,7 @@ bin_file=$create_snapshot_dir/*.bin
 # If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
 #----------------------------------------------------------------------------------------------------#
 
+cd ~
 remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
 sleep 4
 
