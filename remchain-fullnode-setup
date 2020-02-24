@@ -94,8 +94,6 @@ done
 #----------------------------------------------------------------------------------------------------#
 
 apt update && apt install -y wget gnupg
-
-cd ~
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
 
 cat <<EOT >>/etc/apt/sources.list
