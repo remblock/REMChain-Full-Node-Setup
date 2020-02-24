@@ -1,6 +1,6 @@
 # REMChain-Full-Node-Setup - (Ubuntu 18.04)
 
-#### This script will automate the entire process required to set up a full node. Please note that before proceeding you will need to replace (api.remblock.io) and (contact@remblock.io) with your own values. These can be found on the Nginx Reverse Proxy section of the code.
+#### This script will automate the entire process required to set up a full node. Please note that before proceeding you will need to replace (rem.remblock.io) and (contact@remblock.io) with your own values. These can be found on the Nginx Reverse Proxy and SSL Certifcate section of the code.
 
 ***
 
