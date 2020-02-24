@@ -20,12 +20,6 @@ create_shpdata_dir="/root/data/shpdata"
 create_snapshot_dir="/root/data/snapshots"
 
 #----------------------------------------------------------------------------------------------------#
-# INSTALL REMCHAIN SNAPSHOT DEPENDENCIES                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-sudo apt-get install jq -y
-
-#----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
@@ -42,13 +36,7 @@ fi
 # SETUP CONFIG DIRECTORY                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
-wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
-cat /root/config.ini > /root/config/config.ini
-rm /root/config.ini
-echo "" >> /root/config/config.ini
-wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
-cat /root/mainnet.ini >> /root/config/config.ini
-rm /root/mainnet.ini
+echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nhttp-server-address = 0.0.0.0:8888\n\np2p-listen-endpoint = 0.0.0.0:9876\n\n# https://remme.io\n\np2p-peer-address = p2p.remchain.remme.io:2087\n\nverbose-http-errors = true\n\nchain-state-db-size-mb = 100480\n\nreversible-blocks-db-size-mb = 10480" > ./config/config.ini
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALL REMNODE PROTOCOL                                                                           #
@@ -64,26 +52,28 @@ sudo apt install ./remprotocol_0.4.1.amd64.deb
 wget https://remchain.remme.io/genesis.json
 
 #----------------------------------------------------------------------------------------------------#
-# SETUP REMNODE SNAPSHOT                                                                             #
+# RESTORE FROM SNAPSHOT                                                                              #
 #----------------------------------------------------------------------------------------------------#
 
-rm -f $create_snapshot_dir/*.bin
-latest_snapshot=$(curl -s https://geordier.co.uk/snapshots/latestsnapshot.php)
-cd $create_snapshot_dir
-wget -c https://www.geordier.co.uk/snapshots/$latest_snapshot -O - | sudo tar -xz --strip=4
-bin_file=$create_snapshot_dir/*.bin
+sudo wget https://github.com/remblock/REMChain-Remote-Snapshots/raw/master/setup-remote-snapshot 
+sudo chmod u+x setup-remote-snapshot 
+sudo ./setup-remote-snapshot
+cd data
+cd snapshots
+sudo ./restore-remote-snapshot
 
 #----------------------------------------------------------------------------------------------------#
-# START REMNODE FOR THE FIRST TIME                                                                   #
-#----------------------------------------------------------------------------------------------------#
-# If we need to delete all blocks: (--delete-all-blocks --genesis-json /root/genesis.json)           #
-#----------------------------------------------------------------------------------------------------#
-# If "database dirty flag set": (--replay-blockchain --hard-replay-blockchain)                       #
+# SETUP CONFIG DIRECTORY                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --genesis-json $genesis_json_file --disable-replay-opts >> $remnode_log_file 2>&1 &
-sleep 4
+wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
+cat /root/config.ini > /root/config/config.ini
+rm /root/config.ini
+echo "" >> /root/config/config.ini
+wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
+cat /root/mainnet.ini >> /root/config/config.ini
+rm /root/mainnet.ini
 
 #----------------------------------------------------------------------------------------------------#
 # GRACEFULLY STOP REMNODE                                                                            #
@@ -106,7 +96,7 @@ fi
 # START REMNODE IN THE BACKGROUND                                                                    #
 #----------------------------------------------------------------------------------------------------#
 
-remnode --config-dir $create_config_dir --snapshot $bin_file --data-dir $create_data_dir >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
 sleep 4
 
 while [ : ]
@@ -132,26 +122,6 @@ echo ""
 sleep 2
 
 done
-
-#----------------------------------------------------------------------------------------------------#
-# GRACEFULLY STOP REMNODE                                                                            #
-#----------------------------------------------------------------------------------------------------#
-
-remnode_pid=$(pgrep remnode)
-
-if [ ! -z "$remnode_pid" ]; 
-then
-  if ps -p $remnode_pid > /dev/null; 
-  then
-    kill -SIGINT $remnode_pid
-  fi
-  while ps -p $remnode_pid > /dev/null; do
-    sleep 1
-  done
-fi
-
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
-sleep 4
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALL CLANG 8 AND OTHER NEEDED TOOLS                                                             #
