@@ -103,7 +103,7 @@ fi
 # START REMNODE IN THE BACKGROUND                                                                    #
 #----------------------------------------------------------------------------------------------------#
 
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --snapshot $bin_file --disable-replay-opts >> $remnode_log_file 2>&1 &
+remnode --config-dir $create_config_dir --snapshot $bin_file --data-dir $create_data_dir >> $remnode_log_file 2>&1 &
 sleep 4
 
 while [ : ]
@@ -129,6 +129,24 @@ echo ""
 sleep 2
 
 done
+
+#----------------------------------------------------------------------------------------------------#
+# GRACEFULLY STOP REMNODE                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ]; then
+    if ps -p $remnode_pid > /dev/null; then
+        kill -SIGINT $remnode_pid
+    fi
+    while ps -p $remnode_pid > /dev/null; do
+        sleep 1
+    done
+fi
+
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
+sleep 4
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALL CLANG 8 AND OTHER NEEDED TOOLS                                                             #
