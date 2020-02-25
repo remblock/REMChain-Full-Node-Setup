@@ -64,6 +64,7 @@ sudo ./setup-remote-snapshot
 cd data
 cd snapshots
 sudo ./restore-remote-snapshot
+sleep 4
 
 while [ : ]
 do
