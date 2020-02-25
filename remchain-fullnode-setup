@@ -65,43 +65,6 @@ cd data
 cd snapshots
 sudo ./restore-remote-snapshot
 
-#----------------------------------------------------------------------------------------------------#
-# READJUST CONFIG DIRECTORY                                                                          #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
-cat /root/config.ini > /root/config/config.ini
-rm /root/config.ini
-echo "" >> /root/config/config.ini
-wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
-cat /root/mainnet.ini >> /root/config/config.ini
-rm /root/mainnet.ini
-
-#----------------------------------------------------------------------------------------------------#
-# GRACEFULLY STOP REMNODE                                                                            #
-#----------------------------------------------------------------------------------------------------#
-
-remnode_pid=$(pgrep remnode)
-
-if [ ! -z "$remnode_pid" ]; 
-then
-  if ps -p $remnode_pid > /dev/null; 
-  then
-    kill -SIGINT $remnode_pid
-  fi
-  while ps -p $remnode_pid > /dev/null; do
-    sleep 1
-  done
-fi
-
-#----------------------------------------------------------------------------------------------------#
-# START REMNODE IN THE BACKGROUND                                                                    #
-#----------------------------------------------------------------------------------------------------#
-
-remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
-sleep 4
-
 while [ : ]
 do
 
@@ -125,6 +88,42 @@ echo ""
 sleep 2
 
 done
+
+#----------------------------------------------------------------------------------------------------#
+# GRACEFULLY STOP REMNODE                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ]; 
+then
+  if ps -p $remnode_pid > /dev/null; 
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
+fi
+
+#----------------------------------------------------------------------------------------------------#
+# READJUST CONFIG DIRECTORY                                                                          #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
+cat /root/config.ini > /root/config/config.ini
+rm /root/config.ini
+echo "" >> /root/config/config.ini
+wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
+cat /root/mainnet.ini >> /root/config/config.ini
+rm /root/mainnet.ini
+
+#----------------------------------------------------------------------------------------------------#
+# START REMNODE IN THE BACKGROUND                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALL CLANG 8 AND OTHER NEEDED TOOLS                                                             #
