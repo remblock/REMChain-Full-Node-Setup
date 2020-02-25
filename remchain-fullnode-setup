@@ -310,7 +310,7 @@ sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot python-certbot-nginx -y
-sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains $full_node_domain
+sudo certbot --nginx --noninteractive --agree-tos --email $email_contact --domains $full_node_domain
 sudo certbot renew --dry-run
 
 #----------------------------------------------------------------------------------------------------#
@@ -351,6 +351,7 @@ systemctl restart node_shutdown
 
 rm /root/boost_1_70_0.tar.gz
 rm /root/cmake-3.14.5.tar.gz
+rm /root/setup-remote-snapshot
 rm /root/remprotocol_0.4.1.amd64.deb 
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 echo ""
