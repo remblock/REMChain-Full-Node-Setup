@@ -45,6 +45,7 @@ echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nh
 #----------------------------------------------------------------------------------------------------#
 
 wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
+sudo -S apt update && sudo -S apt upgrade -y
 sudo apt install ./remprotocol_0.4.1.amd64.deb
 
 #----------------------------------------------------------------------------------------------------#
