@@ -31,8 +31,8 @@ sudo ufw allow 'Apache'
 sudo mkdir /var/www/$full_node_domain
 sudo chown -R $USER:$USER /var/www/$full_node_domain
 sudo chmod -R 755 /var/www/$full_node_domain
-echo -e "<html>\n<head>\n<title>Welcome to Your_domain!</title>\n</head>\n<body>\n<h1>Success! The $full_node_domain virtual host is working!</h1>\n</body>\n</html>" > ./var/www/$full_node_domain/index.html
-echo -e "<VirtualHost *:80>\nServerAdmin $email_contact\nServerName $full_node_domain\nServerAlias www.$full_node_domain\nDocumentRoot /var/www/$full_node_domain\nErrorLog ${APACHE_LOG_DIR}/error.log\nCustomLog ${APACHE_LOG_DIR}/access.log combined\n</VirtualHost>" > ./etc/apache2/sites-available/$full_node_domain.conf
+echo -e "<html>\n<head>\n<title>Welcome to Your_domain!</title>\n</head>\n<body>\n<h1>Success! The $full_node_domain virtual host is working!</h1>\n</body>\n</html>" > /var/www/$full_node_domain/index.html
+echo -e "<VirtualHost *:80>\nServerAdmin $email_contact\nServerName $full_node_domain\nServerAlias www.$full_node_domain\nDocumentRoot /var/www/$full_node_domain\nErrorLog ${APACHE_LOG_DIR}/error.log\nCustomLog ${APACHE_LOG_DIR}/access.log combined\n</VirtualHost>" > /etc/apache2/sites-available/$full_node_domain.conf
 sudo a2ensite $full_node_domain.conf
 sudo a2dissite 000-default.conf
 sudo systemctl restart apache2
