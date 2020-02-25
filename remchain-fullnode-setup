@@ -26,7 +26,7 @@ create_snapshot_dir="/root/data/snapshots"
 #----------------------------------------------------------------------------------------------------#
 
 sudo -S apt update && sudo -S apt upgrade -y
-sudo apt install apache2
+sudo apt install apache2 -y
 sudo ufw allow 'Apache'
 sudo mkdir /var/www/$full_node_domain
 sudo chown -R $USER:$USER /var/www/$full_node_domain
