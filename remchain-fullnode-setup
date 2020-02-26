@@ -308,7 +308,7 @@ sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot python-certbot-nginx -y
-sudo certbot --nginx --noninteractive --agree-tos --email contact@remblock.io --domains remblock.info
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains remblock.info
 sudo certbot renew --dry-run
 
 #----------------------------------------------------------------------------------------------------#
