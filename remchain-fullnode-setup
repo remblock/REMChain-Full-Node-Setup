@@ -33,7 +33,7 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# SETUP CONFIG DIRECTORY                                                                             #
+# CREATE CONFIG.INI FILE                                                                             #
 #----------------------------------------------------------------------------------------------------#
 
 echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nhttp-server-address = 0.0.0.0:8888\n\np2p-listen-endpoint = 0.0.0.0:9876\n\n# https://remme.io\n\np2p-peer-address = p2p.remchain.remme.io:2087\n\nverbose-http-errors = true\n\nchain-state-db-size-mb = 100480\n\nreversible-blocks-db-size-mb = 10480" > ./config/config.ini
@@ -106,7 +106,7 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
-# READJUST CONFIG DIRECTORY                                                                          #
+# READJUST CONFIG.INI FILE                                                                           #
 #----------------------------------------------------------------------------------------------------#
 
 cd ~
