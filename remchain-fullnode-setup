@@ -235,6 +235,17 @@ exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
 #----------------------------------------------------------------------------------------------------#
+# DOMAIN | INSTALL AND INIT SSL CERTIFCATE                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot -y
+sudo apt-get update
+sudo apt-get install certbot -y
+sudo certbot certonly --standalone --preferred-challenges http -d remblock.info
+
+#----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
 #----------------------------------------------------------------------------------------------------#
 
@@ -300,13 +311,9 @@ sudo systemctl restart nginx
 sudo systemctl enable nginx
 
 #----------------------------------------------------------------------------------------------------#
-# INSTALL AND INIT SSL CERTIFCATE                                                                    #
+# NGINX | INSTALL AND INIT SSL CERTIFCATE                                                            #
 #----------------------------------------------------------------------------------------------------#
 
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository universe
-sudo add-apt-repository ppa:certbot/certbot -y
-sudo apt-get update
 sudo apt-get install certbot python-certbot-nginx -y
 sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains remblock.info
 sudo certbot renew --dry-run
