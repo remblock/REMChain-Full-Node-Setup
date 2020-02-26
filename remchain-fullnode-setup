@@ -11,7 +11,7 @@
 create_data_dir="/root/data"
 state_dir="/root/data/state"
 blocks_dir="/root/data/blocks"
-full_node_domain="remblock2.io"
+full_node_domain="remblock.info"
 create_config_dir="/root/config"
 email_contact="contact@remblock.io"
 remnode_log_file="/root/remnode.log"
