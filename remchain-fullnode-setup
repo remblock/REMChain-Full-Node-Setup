@@ -243,7 +243,7 @@ sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot -y
-sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.io
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
@@ -255,10 +255,10 @@ echo 'server {
 listen 443 ssl;
 listen 80 default_server;
 listen [::]:80 default_server;
-server_name api.remblock.info;
+server_name api.remblock.io;
 client_max_body_size 500m;
-access_log /var/log/nginx/api.remblock.info.access.log;
-error_log /var/log/nginx/api.remblock.info.error.log;
+access_log /var/log/nginx/api.remblock.io.access.log;
+error_log /var/log/nginx/api.remblock.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -315,7 +315,7 @@ sudo systemctl enable nginx
 #----------------------------------------------------------------------------------------------------#
 
 sudo apt-get install certbot python-certbot-nginx -y
-sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.io
 
 #----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
