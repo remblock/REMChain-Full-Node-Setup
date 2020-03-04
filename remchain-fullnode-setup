@@ -42,7 +42,7 @@ echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nh
 # INSTALL REMNODE PROTOCOL                                                                           #
 #----------------------------------------------------------------------------------------------------#
 
-wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb 
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb
 sudo -S apt update && sudo -S apt upgrade -y
 sudo apt install ./remprotocol_0.4.1.amd64.deb
 
@@ -56,8 +56,8 @@ wget https://remchain.remme.io/genesis.json
 # RESTORE FROM SNAPSHOT                                                                              #
 #----------------------------------------------------------------------------------------------------#
 
-sudo wget https://github.com/remblock/REMChain-Remote-Snapshots/raw/master/setup-remote-snapshot 
-sudo chmod u+x setup-remote-snapshot 
+sudo wget https://github.com/remblock/REMChain-Remote-Snapshots/raw/master/setup-remote-snapshot
+sudo chmod u+x setup-remote-snapshot
 sudo ./setup-remote-snapshot
 cd data
 cd snapshots
@@ -69,7 +69,7 @@ do
 
 systemdt=$(date '+%Y-%m-%dT%H:%M')
 
-if [ "$dt1" == "$systemdt" ] 
+if [ "$dt1" == "$systemdt" ]
 then
   break
 else
@@ -94,9 +94,9 @@ done
 
 remnode_pid=$(pgrep remnode)
 
-if [ ! -z "$remnode_pid" ]; 
+if [ ! -z "$remnode_pid" ];
 then
-  if ps -p $remnode_pid > /dev/null; 
+  if ps -p $remnode_pid > /dev/null;
   then
     kill -SIGINT $remnode_pid
   fi
@@ -158,7 +158,7 @@ sudo -S apt update && sudo -S apt upgrade -y \
     python3-dev         \
     rustc               \
     zlib1g-dev
-    
+
 update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
 update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
 
@@ -356,7 +356,7 @@ systemctl restart node_shutdown
 rm /root/boost_1_70_0.tar.gz
 rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
-rm /root/remprotocol_0.4.1.amd64.deb 
+rm /root/remprotocol_0.4.1.amd64.deb
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 echo ""
 echo "====================================="
