@@ -44,6 +44,7 @@ echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nh
 
 sudo -S apt update && sudo -S apt upgrade -y
 wget https://raw.githubusercontent.com/remblock/REMChain-Scripts/master/remprotocol
+chmod +x remprotocol
 sudo ./remprotocol
 
 #----------------------------------------------------------------------------------------------------#
