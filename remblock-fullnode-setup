@@ -1,0 +1,504 @@
+#!/bin/bash
+
+#****************************************************************************************************#
+#                                        REMCHAIN FULLNODE SETUP                                     #
+#****************************************************************************************************#
+
+#----------------------------------------------------------------------------------------------------#
+# CONFIGURATION VARIABLES                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+create_data_dir="/root/data"
+state_dir="/root/data/state"
+blocks_dir="/root/data/blocks"
+create_config_dir="/root/config"
+remnode_log_file="/root/remnode.log"
+config_file="/root/config/config.ini"
+genesis_json_file="/root/genesis.json"
+create_rocksdb_dir="/root/data/rocksdb"
+create_shpdata_dir="/root/data/shpdata"
+create_snapshot_dir="/root/data/snapshots"
+
+#----------------------------------------------------------------------------------------------------#
+# CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
+#----------------------------------------------------------------------------------------------------#
+
+if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
+then
+  mkdir -p "$create_data_dir"
+  mkdir -p "$create_config_dir"
+  mkdir -p "$create_rocksdb_dir"
+  mkdir -p "$create_shpdata_dir"
+  mkdir -p "$create_snapshot_dir"
+fi
+
+#----------------------------------------------------------------------------------------------------#
+# CREATE CONFIG.INI FILE                                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nhttp-server-address = 0.0.0.0:8888\n\np2p-listen-endpoint = 0.0.0.0:9876\n\n# https://remme.io\n\np2p-peer-address = p2p.remchain.remme.io:2087\n\nverbose-http-errors = true\n\nchain-state-db-size-mb = 100480\n\nreversible-blocks-db-size-mb = 10480" > ./config/config.ini
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL REMNODE PROTOCOL                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://github.com/Remmeauth/remprotocol/releases/download/0.4.1/remprotocol_0.4.1.amd64.deb
+sudo -S apt update && sudo -S apt upgrade -y
+sudo apt install ./remprotocol_0.4.1.amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
+# FETCHING GENESIS JSON                                                                              #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://remchain.remme.io/genesis.json
+
+#----------------------------------------------------------------------------------------------------#
+# RESTORE FROM SNAPSHOT                                                                              #
+#----------------------------------------------------------------------------------------------------#
+
+sudo wget https://github.com/remblock/REMChain-Remote-Snapshots/raw/master/setup-remote-snapshot
+sudo chmod u+x setup-remote-snapshot
+sudo ./setup-remote-snapshot
+cd data
+cd snapshots
+sudo ./restore-remote-snapshot
+sleep 4
+
+while [ : ]
+do
+
+systemdt=$(date '+%Y-%m-%dT%H:%M')
+
+if [ "$dt1" == "$systemdt" ]
+then
+  break
+else
+  dt1=$(remcli get info | grep head_block_time | cut -c 23-38)
+  dt1date=$(echo $dt1 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+  dt1time=$(echo $dt1 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+  dt2=$(tail -n 1 $remnode_log_file | awk '{print $2}'| awk -F'.' '{print $1}')
+  dt2date=$(echo $dt2 | awk -F'T' '{print $1}' | awk -F'-' 'BEGIN {OFS="-"}{ print $3, $2, $1}')
+  dt2time=$(echo $dt2 | awk -F'T' '{print $2}' | awk -F':' 'BEGIN {OFS=":"}{ print $1, $2}')
+
+  echo "Fetching blocks for [${dt1date} | ${dt1time}] | Current block date [${dt2date} | ${dt2time}]"
+fi
+
+echo ""
+sleep 2
+
+done
+
+#----------------------------------------------------------------------------------------------------#
+# GRACEFULLY STOP REMNODE                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ];
+then
+  if ps -p $remnode_pid > /dev/null;
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
+fi
+
+#----------------------------------------------------------------------------------------------------#
+# READJUST CONFIG.INI FILE                                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
+cat /root/config.ini > /root/config/config.ini
+rm /root/config.ini
+echo "" >> /root/config/config.ini
+wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
+cat /root/mainnet.ini >> /root/config/config.ini
+rm /root/mainnet.ini
+
+#----------------------------------------------------------------------------------------------------#
+# START REMNODE IN THE BACKGROUND                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
+remnode --config-dir $create_config_dir --data-dir $create_data_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL CLANG 8 AND OTHER NEEDED TOOLS                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+apt update && apt install -y wget gnupg
+wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add -
+
+cat <<EOT >>/etc/apt/sources.list
+deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main
+deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main
+deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main
+deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main
+EOT
+
+sudo -S apt update && sudo -S apt upgrade -y \
+    autoconf2.13        \
+    build-essential     \
+    bzip2               \
+    cargo               \
+    clang-8             \
+    git                 \
+    libgmp-dev          \
+    libpq-dev           \
+    lld-8               \
+    lldb-8              \
+    ninja-build         \
+    nodejs              \
+    npm                 \
+    pkg-config          \
+    postgresql-server-dev-all \
+    python2.7-dev       \
+    python3-dev         \
+    rustc               \
+    zlib1g-dev
+
+update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 100
+update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-8 100
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL BOOST 1.70                                                                                 #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://dl.bintray.com/boostorg/release/1.70.0/source/boost_1_70_0.tar.gz
+tar xf boost_1_70_0.tar.gz
+cd boost_1_70_0
+./bootstrap.sh
+./b2 toolset=clang -j10 install
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL CMAKE 3.14.5                                                                               #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/Kitware/CMake/releases/download/v3.14.5/cmake-3.14.5.tar.gz
+tar xf cmake-3.14.5.tar.gz
+cd cmake-3.14.5
+./bootstrap --parallel=10
+make -j10
+make -j10 install
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALL EOSIO CDT 1.6.2                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+wget https://github.com/EOSIO/eosio.cdt/releases/download/v1.6.2/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+apt install -y ./eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
+# BUILD HISTORY TOOLS                                                                                #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+git clone --recursive https://github.com/EOSIO/history-tools.git
+cd history-tools
+mkdir build
+cd build
+cmake -GNinja -DCMAKE_CXX_COMPILER=clang++-8 -DCMAKE_C_COMPILER=clang-8 ..
+bash -c "cd ../src && npm install node-fetch"
+ninja
+
+#****************************************************************************************************#
+#                                     STARTING FULL NODE PROCESSES                                   #
+#****************************************************************************************************#
+
+#----------------------------------------------------------------------------------------------------#
+# SET ENVIRONMENT VARIABLES                                                                          #
+#----------------------------------------------------------------------------------------------------#
+
+nohup ~/history-tools/build/combo-rocksdb --rdb-database $create_rocksdb_dir &> /dev/null &
+
+#----------------------------------------------------------------------------------------------------#
+# RESTART ALL PROCESSES ON REBOOT                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
+echo '#!/bin/bash
+
+create_rem_dir="/root/data"
+create_config_dir="/root/config"
+create_shpdata_dir="/root/data/shpdata"
+remnode_log_file="/root/remnode.log"
+
+sudo resize2fs /dev/nvme1n1
+
+remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
+
+exit 0' > /etc/rc.local
+sudo chmod +x /etc/rc.local
+
+#----------------------------------------------------------------------------------------------------#
+# DOMAIN | INSTALL AND INIT SSL CERTIFCATE                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot -y
+sudo apt-get update
+sudo apt-get install certbot -y
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+
+#----------------------------------------------------------------------------------------------------#
+# NGINX REVERSE PROXY                                                                                #
+#----------------------------------------------------------------------------------------------------#
+
+apt-get install nginx -y
+unlink /etc/nginx/sites-enabled/default
+echo 'server {
+listen 80 default_server;
+listen [::]:80 default_server;
+server_name bp.remblock.info;
+root /var/www/html;
+client_max_body_size 500m;
+access_log /var/log/nginx/bp.remblock.info.access.log;
+error_log /var/log/nginx/bp.remblock.info.error.log;
+add_header "Access-Control-Allow-Origin" "*";
+# add_header "Access-Control-Allow-Credentials" "true";
+add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
+Authorization, X-Custom-Header, token, timestamp, version";
+add_header "Access-Control-Expose-Headers" "*";
+add_header "Access-Control-Allow-Methods" "*";
+add_header "Access-Control-Max-Age" 600;
+add_header "Allow" "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH";
+add_header "Vary" "Origin";
+location / {
+proxy_pass http://127.0.0.1:8888/v1/chain/get_info;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /images {
+autoindex on;
+autoindex_format html;
+}
+location ~ \.json {
+add_header  Content-Type    application/json;
+}
+}' >> /etc/nginx/sites-available/reverse-proxy.conf
+
+echo 'server {
+listen 443 ssl;
+server_name bp.remblock.info;
+root /var/www/html;
+client_max_body_size 500m;
+access_log /var/log/nginx/bp.remblock.info.access.log;
+error_log /var/log/nginx/bp.remblock.info.error.log;
+add_header "Access-Control-Allow-Origin" "*";
+# add_header "Access-Control-Allow-Credentials" "true";
+add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
+Authorization, X-Custom-Header, token, timestamp, version";
+add_header "Access-Control-Expose-Headers" "*";
+add_header "Access-Control-Allow-Methods" "*";
+add_header "Access-Control-Max-Age" 600;
+add_header "Allow" "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH";
+add_header "Vary" "Origin";
+location / {
+proxy_pass http://127.0.0.1:8888/v1/chain/get_info;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location images {
+autoindex on;
+autoindex_format html;
+}
+location ~ \.json {
+add_header  Content-Type    application/json;
+}
+}' >> /etc/nginx/sites-available/reverse-proxy.conf
+
+echo 'server {
+listen 80 default_server;
+listen [::]:80 default_server;
+server_name api.remblock.info;
+client_max_body_size 500m;
+access_log /var/log/nginx/api.remblock.info.access.log;
+error_log /var/log/nginx/api.remblock.info.error.log;
+add_header "Access-Control-Allow-Origin" "*";
+# add_header "Access-Control-Allow-Credentials" "true";
+add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
+Authorization, X-Custom-Header, token, timestamp, version";
+add_header "Access-Control-Expose-Headers" "*";
+add_header "Access-Control-Allow-Methods" "*";
+add_header "Access-Control-Max-Age" 600;
+add_header "Allow" "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH";
+add_header "Vary" "Origin";
+location / {
+proxy_pass http://127.0.0.1:8888/v1/chain/get_info;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v2 {
+proxy_pass http://127.0.0.1:7000/v2;
+add_header "Access-Control-Allow-Origin" "";
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v1/history {
+proxy_pass http://127.0.0.1:7000/v1/history;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v1 {
+proxy_pass http://127.0.0.1:8888;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+}' >> /etc/nginx/sites-available/reverse-proxy.conf
+
+echo 'server {
+listen 443 ssl;
+server_name api.remblock.info;
+client_max_body_size 500m;
+access_log /var/log/nginx/api.remblock.info.access.log;
+error_log /var/log/nginx/api.remblock.info.error.log;
+add_header "Access-Control-Allow-Origin" "*";
+# add_header "Access-Control-Allow-Credentials" "true";
+add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
+Authorization, X-Custom-Header, token, timestamp, version";
+add_header "Access-Control-Expose-Headers" "*";
+add_header "Access-Control-Allow-Methods" "*";
+add_header "Access-Control-Max-Age" 600;
+add_header "Allow" "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH";
+add_header "Vary" "Origin";
+location / {
+proxy_pass http://127.0.0.1:8888/v1/chain/get_info;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v2 {
+proxy_pass http://127.0.0.1:7000/v2;
+add_header "Access-Control-Allow-Origin" "";
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v1/history {
+proxy_pass http://127.0.0.1:7000/v1/history;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+location /v1 {
+proxy_pass http://127.0.0.1:8888;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header Host $host;
+proxy_redirect off;
+proxy_headers_hash_bucket_size 128;
+}
+}' >> /etc/nginx/sites-available/reverse-proxy.conf
+
+sudo ln -s /etc/nginx/sites-available/reverse-proxy.conf /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
+sudo systemctl enable nginx
+
+#----------------------------------------------------------------------------------------------------#
+# NGINX | GET BP.JSON FROM GITHUB                                                                    #
+#----------------------------------------------------------------------------------------------------#
+
+wget https://github.com/remblock/REMChain-Full-Node-Setup/blob/master/bp.json -O /var/www/html/bp.json
+
+#----------------------------------------------------------------------------------------------------#
+# NGINX | GET IMAGES FROM DROPBOX
+#----------------------------------------------------------------------------------------------------#
+
+mkdir /var/www/html/images && cd /var/www/html/images
+wget https://www.dropbox.com/s/kwuhlveodwi94ir/remblock_logo.svg
+wget https://www.dropbox.com/s/9z5bs3h47ciikqa/remblock_logo_256.png
+wget https://www.dropbox.com/s/mcmcprxceyz2ayd/remblock_logo_1024.png
+
+#----------------------------------------------------------------------------------------------------#
+# NGINX | INSTALL AND INIT SSL CERTIFCATE                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+sudo apt-get install certbot python-certbot-nginx -y
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+
+#----------------------------------------------------------------------------------------------------#
+# SETUP GRACEFUL SHUTDOWN                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+echo '#!/bin/sh
+remnode_pid=$(pgrep remnode)
+if [ ! -z "$remnode_pid" ]; then
+if ps -p $remnode_pid > /dev/null; then
+kill -SIGINT $remnode_pid
+fi
+while ps -p $remnode_pid > /dev/null; do
+sleep 1
+done
+fi
+' > /root/node_shutdown.sh
+echo '[Unit]
+Description=Gracefully shut down remnode to avoid database dirty flag
+DefaultDependencies=no
+After=poweroff.target shutdown.target reboot.target halt.target kexec.target
+Requires=network-online.target network.target
+[Service]
+Type=oneshot
+ExecStop=/root/node_shutdown.sh
+RemainAfterExit=yes
+KillMode=none
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/node_shutdown.service
+sudo chmod +x /root/node_shutdown.sh
+systemctl daemon-reload
+systemctl enable node_shutdown
+systemctl restart node_shutdown
+
+#----------------------------------------------------------------------------------------------------#
+# CLEANUP INSTALLATION FILES                                                                         #
+#----------------------------------------------------------------------------------------------------#
+
+rm /root/boost_1_70_0.tar.gz
+rm /root/cmake-3.14.5.tar.gz
+rm /root/setup-remote-snapshot
+rm /root/remprotocol_0.4.1.amd64.deb 
+rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+echo ""
+echo "====================================="
+echo "REMCHAIN-FULLNODE-SETUP HAS COMPLETED"
+echo "====================================="
+echo ""
