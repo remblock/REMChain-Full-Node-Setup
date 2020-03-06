@@ -252,8 +252,8 @@ sudo certbot certonly --standalone --agree-tos --preferred-challenges http --ema
 apt-get install nginx -y
 unlink /etc/nginx/sites-enabled/default
 echo 'server {
-listen 80 default_server;
-listen [::]:80 default_server;
+listen 80;
+listen [::]:80;
 server_name bp.remblock.info;
 root /var/www/html;
 client_max_body_size 500m;
@@ -321,8 +321,8 @@ add_header  Content-Type    application/json;
 }' >> /etc/nginx/sites-available/reverse-proxy.conf
 
 echo 'server {
-listen 80 default_server;
-listen [::]:80 default_server;
+listen 80;
+listen [::]:80;
 server_name api.remblock.info;
 client_max_body_size 500m;
 access_log /var/log/nginx/api.remblock.info.access.log;
@@ -440,7 +440,7 @@ sudo systemctl enable nginx
 wget https://github.com/remblock/REMChain-Full-Node-Setup/blob/master/bp.json -O /var/www/html/bp.json
 
 #----------------------------------------------------------------------------------------------------#
-# NGINX | GET IMAGES FROM DROPBOX
+# NGINX | GET IMAGES FROM DROPBOX                                                                    #
 #----------------------------------------------------------------------------------------------------#
 
 mkdir /var/www/html/images && cd /var/www/html/images
