@@ -294,6 +294,10 @@ echo 'server {
 listen 443 ssl;
 server_name bp.remblock.info;
 root /var/www/html;
+ssl on;
+ssl_certificate /etc/letsencrypt/live/api.remblock.info/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/api.remblock.info/privkey.pem;
+include /etc/letsencrypt/options-ssl-nginx.conf
 client_max_body_size 500m;
 access_log /var/log/nginx/bp.remblock.info.access.log;
 error_log /var/log/nginx/bp.remblock.info.error.log;
@@ -382,6 +386,10 @@ proxy_headers_hash_bucket_size 128;
 echo 'server {
 listen 443 ssl;
 server_name api.remblock.info;
+ssl on;
+ssl_certificate /etc/letsencrypt/live/api.remblock.info/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/api.remblock.info/privkey.pem;
+include /etc/letsencrypt/options-ssl-nginx.conf
 client_max_body_size 500m;
 access_log /var/log/nginx/api.remblock.info.access.log;
 error_log /var/log/nginx/api.remblock.info.error.log;
