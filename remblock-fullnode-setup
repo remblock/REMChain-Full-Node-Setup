@@ -245,6 +245,7 @@ sudo apt-get update
 sudo apt-get install certbot -y
 sudo systemctl stop nginx
 sudo systemctl stop apache2
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.info
 sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
 #TRY THIS IF ABOVE DOESNT WORK
 #sudo certbot certonly --nginx --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
@@ -466,6 +467,7 @@ wget https://www.dropbox.com/s/mcmcprxceyz2ayd/remblock_logo_1024.png
 
 cd ~
 sudo apt-get install certbot python-certbot-nginx -y
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.info
 sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
 
 #----------------------------------------------------------------------------------------------------#
