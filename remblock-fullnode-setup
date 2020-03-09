@@ -276,7 +276,7 @@ root /var/www/html;
 ssl on;
 ssl_certificate /etc/letsencrypt/live/bp.remblock.info/fullchain.pem;
 ssl_certificate_key /etc/letsencrypt/live/bp.remblock.info/privkey.pem;
-# include /etc/letsencrypt/options-ssl-nginx.conf;
+include /etc/letsencrypt/options-ssl-nginx.conf;
 client_max_body_size 500m;
 access_log /var/log/nginx/bp.remblock.info.access.log;
 error_log /var/log/nginx/bp.remblock.info.error.log;
@@ -298,7 +298,7 @@ proxy_set_header Host $host;
 proxy_redirect off;
 proxy_headers_hash_bucket_size 128;
 }
-location images {
+location /images {
 autoindex on;
 autoindex_format html;
 }
@@ -368,7 +368,7 @@ server_name api.remblock.info;
 ssl on;
 ssl_certificate /etc/letsencrypt/live/api.remblock.info/fullchain.pem;
 ssl_certificate_key /etc/letsencrypt/live/api.remblock.info/privkey.pem;
-# include /etc/letsencrypt/options-ssl-nginx.conf;
+include /etc/letsencrypt/options-ssl-nginx.conf;
 client_max_body_size 500m;
 access_log /var/log/nginx/api.remblock.info.access.log;
 error_log /var/log/nginx/api.remblock.info.error.log;
@@ -487,10 +487,10 @@ systemctl restart node_shutdown
 rm /root/boost_1_70_0.tar.gz
 rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
-rm /root/remprotocol_0.4.1.amd64.deb 
+rm /root/remprotocol_0.4.1.amd64.deb
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 echo ""
 echo "====================================="
-echo "REMCHAIN-FULLNODE-SETUP HAS COMPLETED"
+echo "REMBLOCK-FULLNODE-SETUP HAS COMPLETED"
 echo "====================================="
 echo ""
