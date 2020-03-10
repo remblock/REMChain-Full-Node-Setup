@@ -26,7 +26,7 @@ create_snapshot_dir="/root/data/snapshots"
 
 if [ ! -d "$create_ssh_dir" -o -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
 then
-  mkdir -p ~/.ssh
+  mkdir -p "$create_ssh_dir"
   mkdir -p "$create_data_dir"
   mkdir -p "$create_config_dir"
   mkdir -p "$create_rocksdb_dir"
