@@ -62,7 +62,6 @@ sudo -S ufw enable
 sudo -S apt -y install fail2ban
 sudo -S systemctl enable fail2ban
 sudo -S systemctl start fail2ban
-sudo -S service sshd restart
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALLING CANONICAL LIVEPATCH SERVICE                                                             #
