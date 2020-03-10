@@ -20,6 +20,57 @@ create_shpdata_dir="/root/data/shpdata"
 create_snapshot_dir="/root/data/snapshots"
 
 #----------------------------------------------------------------------------------------------------#
+# CHANGING DEFAULT SSH PORT NUMBER                                                                   #
+#----------------------------------------------------------------------------------------------------#
+
+while [ : ]
+do
+
+	 read -p "PLEASE ENTER A RANDOM 5 DIGIT PORT NUMBER: " portnumber
+
+         if [[ ${#portnumber} -ne 5 ]]
+         then
+                 printf "\nERROR: PORT NUMBER SHOULD BE EXACTLY 5 DIGITS.\n\n"
+                 continue
+         elif [[ ! -z "${portnumber//[0-9]}" ]]
+         then
+                 printf "\nERROR: PORT NUMBER SHOULD CONTAIN NUMBERS ONLY.\n\n"
+                 continue
+         else
+                 sudo -S sed -i "/^#Port 22/s/#Port 22/Port $portnumber/" /etc/ssh/sshd_config && sed -i '/^PermitRootLogin/s/yes/without-password/' /etc/ssh/sshd_config && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+		 break
+         fi
+done
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING UNCOMPLICATED FIREWALL                                                                  #
+#----------------------------------------------------------------------------------------------------#
+
+sudo -S apt-get install ufw -y
+sudo -S ufw allow ssh/tcp
+sudo -S ufw limit ssh/tcp
+sudo -S ufw allow $portnumber/tcp
+sudo -S ufw allow 8888/tcp
+sudo -S ufw allow 9876/tcp
+sudo -S ufw logging on
+sudo -S ufw enable
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING FAIL2BAN                                                                                #
+#----------------------------------------------------------------------------------------------------#
+
+sudo -S apt -y install fail2ban
+sudo -S systemctl enable fail2ban
+sudo -S systemctl start fail2ban
+sudo -S service sshd restart
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING CANONICAL LIVEPATCH SERVICE                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+sudo snap install canonical-livepatch
+
+#----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
@@ -201,8 +252,8 @@ echo '#!/bin/bash
 
 create_rem_dir="/root/data"
 create_config_dir="/root/config"
-create_shpdata_dir="/root/data/shpdata"
 remnode_log_file="/root/remnode.log"
+create_shpdata_dir="/root/data/shpdata"
 
 sudo resize2fs /dev/nvme1n1
 
@@ -222,10 +273,8 @@ sudo apt-get update
 sudo apt-get install certbot -y
 sudo systemctl stop nginx
 sudo systemctl stop apache2
-sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.info
-sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
-#TRY THIS IF ABOVE DOESNT WORK
-#sudo certbot certonly --nginx --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.io
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.io
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX REVERSE PROXY                                                                                #
@@ -237,11 +286,11 @@ unlink /etc/nginx/sites-enabled/default
 echo 'server {
 listen 80;
 listen [::]:80;
-server_name bp.remblock.info;
+server_name bp.remblock.io;
 root /var/www/html;
 client_max_body_size 500m;
-access_log /var/log/nginx/bp.remblock.info.access.log;
-error_log /var/log/nginx/bp.remblock.info.error.log;
+access_log /var/log/nginx/bp.remblock.io.access.log;
+error_log /var/log/nginx/bp.remblock.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -271,14 +320,14 @@ add_header  Content-Type    application/json;
 
 echo 'server {
 listen 443 ssl;
-server_name bp.remblock.info;
+server_name bp.remblock.io;
 root /var/www/html;
 ssl on;
-ssl_certificate /etc/letsencrypt/live/bp.remblock.info/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/bp.remblock.info/privkey.pem;
+ssl_certificate /etc/letsencrypt/live/bp.remblock.io/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/bp.remblock.io/privkey.pem;
 client_max_body_size 500m;
-access_log /var/log/nginx/bp.remblock.info.access.log;
-error_log /var/log/nginx/bp.remblock.info.error.log;
+access_log /var/log/nginx/bp.remblock.io.access.log;
+error_log /var/log/nginx/bp.remblock.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -309,10 +358,10 @@ add_header  Content-Type    application/json;
 echo 'server {
 listen 80;
 listen [::]:80;
-server_name api.remblock.info;
+server_name api.remblock.io;
 client_max_body_size 500m;
-access_log /var/log/nginx/api.remblock.info.access.log;
-error_log /var/log/nginx/api.remblock.info.error.log;
+access_log /var/log/nginx/api.remblock.io.access.log;
+error_log /var/log/nginx/api.remblock.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -363,13 +412,13 @@ proxy_headers_hash_bucket_size 128;
 
 echo 'server {
 listen 443 ssl;
-server_name api.remblock.info;
+server_name api.remblock.io;
 ssl on;
-ssl_certificate /etc/letsencrypt/live/api.remblock.info/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/api.remblock.info/privkey.pem;
+ssl_certificate /etc/letsencrypt/live/api.remblock.io/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/api.remblock.io/privkey.pem;
 client_max_body_size 500m;
-access_log /var/log/nginx/api.remblock.info.access.log;
-error_log /var/log/nginx/api.remblock.info.error.log;
+access_log /var/log/nginx/api.remblock.io.access.log;
+error_log /var/log/nginx/api.remblock.io.error.log;
 add_header "Access-Control-Allow-Origin" "*";
 # add_header "Access-Control-Allow-Credentials" "true";
 add_header "Access-Control-Allow-Headers" "Origin, X-Requested-With, Content-Type,
@@ -433,9 +482,14 @@ wget https://raw.githubusercontent.com/remblock/REMChain-Full-Node-Setup/master/
 #----------------------------------------------------------------------------------------------------#
 
 mkdir /var/www/html/images && cd /var/www/html/images
-wget https://www.dropbox.com/s/kwuhlveodwi94ir/remblock_logo.svg
-wget https://www.dropbox.com/s/9z5bs3h47ciikqa/remblock_logo_256.png
-wget https://www.dropbox.com/s/mcmcprxceyz2ayd/remblock_logo_1024.png
+wget https://www.dropbox.com/s/efn7kwj3a6428tw/remblock_logo.svg
+wget https://www.dropbox.com/s/856hpih1kftykup/remblock_logo_256.png
+wget https://www.dropbox.com/s/f88fwq8iqzf1k66/remblock_logo_1024.png
+wget https://www.dropbox.com/s/jwj8con80yfd0gf/remblock_logo_4000.png
+chmod 444 remblock_logo*
+chmod 444 remblock_logo_256*
+chmod 444 remblock_logo_1024*
+chmod 444 remblock_logo_4000*
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX | INSTALL AND INIT SSL CERTIFCATE                                                            #
@@ -443,8 +497,8 @@ wget https://www.dropbox.com/s/mcmcprxceyz2ayd/remblock_logo_1024.png
 
 cd ~
 sudo apt-get install certbot python-certbot-nginx -y
-sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.info
-sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.info
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains bp.remblock.io
+sudo certbot --nginx --noninteractive --agree-tos --preferred-challenges http --email contact@remblock.io --domains api.remblock.io
 
 #----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
