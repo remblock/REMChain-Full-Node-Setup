@@ -20,56 +20,6 @@ create_shpdata_dir="/root/data/shpdata"
 create_snapshot_dir="/root/data/snapshots"
 
 #----------------------------------------------------------------------------------------------------#
-# CHANGING DEFAULT SSH PORT NUMBER                                                                   #
-#----------------------------------------------------------------------------------------------------#
-
-while [ : ]
-do
-
-	 read -p "PLEASE ENTER A RANDOM 5 DIGIT PORT NUMBER: " portnumber
-
-         if [[ ${#portnumber} -ne 5 ]]
-         then
-                 printf "\nERROR: PORT NUMBER SHOULD BE EXACTLY 5 DIGITS.\n\n"
-                 continue
-         elif [[ ! -z "${portnumber//[0-9]}" ]]
-         then
-                 printf "\nERROR: PORT NUMBER SHOULD CONTAIN NUMBERS ONLY.\n\n"
-                 continue
-         else
-                 sudo -S sed -i "/^#Port 22/s/#Port 22/Port $portnumber/" /etc/ssh/sshd_config && sed -i '/^PermitRootLogin/s/yes/without-password/' /etc/ssh/sshd_config && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
-		 break
-         fi
-done
-
-#----------------------------------------------------------------------------------------------------#
-# INSTALLING UNCOMPLICATED FIREWALL                                                                  #
-#----------------------------------------------------------------------------------------------------#
-
-sudo -S apt-get install ufw -y
-sudo -S ufw allow ssh/tcp
-sudo -S ufw limit ssh/tcp
-sudo -S ufw allow $portnumber/tcp
-sudo -S ufw allow 8888/tcp
-sudo -S ufw allow 9876/tcp
-sudo -S ufw logging on
-sudo -S ufw enable
-
-#----------------------------------------------------------------------------------------------------#
-# INSTALLING FAIL2BAN                                                                                #
-#----------------------------------------------------------------------------------------------------#
-
-sudo -S apt -y install fail2ban
-sudo -S systemctl enable fail2ban
-sudo -S systemctl start fail2ban
-
-#----------------------------------------------------------------------------------------------------#
-# INSTALLING CANONICAL LIVEPATCH SERVICE                                                             #
-#----------------------------------------------------------------------------------------------------#
-
-sudo snap install canonical-livepatch
-
-#----------------------------------------------------------------------------------------------------#
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
@@ -541,6 +491,56 @@ rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
 rm /root/remprotocol_0.4.1.amd64.deb
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+
+#----------------------------------------------------------------------------------------------------#
+# CHANGING DEFAULT SSH PORT NUMBER                                                                   #
+#----------------------------------------------------------------------------------------------------#
+
+while [ : ]
+do
+
+	 read -p "PLEASE ENTER A RANDOM 5 DIGIT PORT NUMBER: " portnumber
+
+         if [[ ${#portnumber} -ne 5 ]]
+         then
+                 printf "\nERROR: PORT NUMBER SHOULD BE EXACTLY 5 DIGITS.\n\n"
+                 continue
+         elif [[ ! -z "${portnumber//[0-9]}" ]]
+         then
+                 printf "\nERROR: PORT NUMBER SHOULD CONTAIN NUMBERS ONLY.\n\n"
+                 continue
+         else
+                 sudo -S sed -i "/^#Port 22/s/#Port 22/Port $portnumber/" /etc/ssh/sshd_config && sed -i '/^PermitRootLogin/s/yes/without-password/' /etc/ssh/sshd_config && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+		 break
+         fi
+done
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING UNCOMPLICATED FIREWALL                                                                  #
+#----------------------------------------------------------------------------------------------------#
+
+sudo -S apt-get install ufw -y
+sudo -S ufw allow ssh/tcp
+sudo -S ufw limit ssh/tcp
+sudo -S ufw allow $portnumber/tcp
+sudo -S ufw allow 8888/tcp
+sudo -S ufw allow 9876/tcp
+sudo -S ufw logging on
+sudo -S ufw enable
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING FAIL2BAN                                                                                #
+#----------------------------------------------------------------------------------------------------#
+
+sudo -S apt -y install fail2ban
+sudo -S systemctl enable fail2ban
+sudo -S systemctl start fail2ban
+
+#----------------------------------------------------------------------------------------------------#
+# INSTALLING CANONICAL LIVEPATCH SERVICE                                                             #
+#----------------------------------------------------------------------------------------------------#
+
+sudo snap install canonical-livepatch
 
 #----------------------------------------------------------------------------------------------------#
 # ADDING SSH PUBLIC KEY TO SERVER                                                                    #
