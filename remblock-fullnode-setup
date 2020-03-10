@@ -520,6 +520,8 @@ done
 #----------------------------------------------------------------------------------------------------#
 
 sudo -S apt-get install ufw -y
+sudo -S ufw allow http
+sudo -S ufw allow https
 sudo -S ufw allow ssh/tcp
 sudo -S ufw limit ssh/tcp
 sudo -S ufw allow $portnumber/tcp
