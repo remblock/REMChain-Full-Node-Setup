@@ -66,6 +66,7 @@ sudo ./setup-remote-snapshot
 cd data
 cd snapshots
 sudo ./restore-remote-snapshot
+echo ""
 
 #----------------------------------------------------------------------------------------------------#
 # GRACEFULLY STOP REMNODE                                                                            #
