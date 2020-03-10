@@ -23,7 +23,7 @@ create_snapshot_dir="/root/data/snapshots"
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -d ~/.ssh ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
+if [ ! -o -d ~/.ssh ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
 then
   mkdir -p ~/.ssh
   mkdir -p "$create_data_dir"
