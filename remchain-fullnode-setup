@@ -204,8 +204,8 @@ echo '#!/bin/bash
 
 create_rem_dir="/root/data"
 create_config_dir="/root/config"
-create_shpdata_dir="/root/data/shpdata"
 remnode_log_file="/root/remnode.log"
+create_shpdata_dir="/root/data/shpdata"
 
 sudo resize2fs /dev/nvme1n1
 
