@@ -434,16 +434,16 @@ wget https://raw.githubusercontent.com/remblock/REMChain-Full-Node-Setup/master/
 #----------------------------------------------------------------------------------------------------#
 
 mkdir /var/www/html/images
-chmod 444 /var/www/html/images
+chmod 755 /var/www/html/images
 cd /var/www/html/images
 wget https://www.dropbox.com/s/efn7kwj3a6428tw/remblock_logo.svg
 wget https://www.dropbox.com/s/856hpih1kftykup/remblock_logo_256.png
 wget https://www.dropbox.com/s/f88fwq8iqzf1k66/remblock_logo_1024.png
 wget https://www.dropbox.com/s/jwj8con80yfd0gf/remblock_logo_4000.png
-chmod 444 remblock_logo*
-chmod 444 remblock_logo_256*
-chmod 444 remblock_logo_1024*
-chmod 444 remblock_logo_4000*
+chmod 644 remblock_logo*
+chmod 644 remblock_logo_256*
+chmod 644 remblock_logo_1024*
+chmod 644 remblock_logo_4000*
 
 #----------------------------------------------------------------------------------------------------#
 # NGINX | INSTALL AND INIT SSL CERTIFCATE                                                            #
