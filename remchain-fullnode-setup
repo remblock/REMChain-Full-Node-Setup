@@ -8,6 +8,7 @@
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
+create_ssh_dir="/root/.ssh"
 create_data_dir="/root/data"
 state_dir="/root/data/state"
 blocks_dir="/root/data/blocks"
@@ -25,6 +26,7 @@ create_snapshot_dir="/root/data/snapshots"
 
 if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
 then
+  mkdir -p "$create_ssh_dir"
   mkdir -p "$create_data_dir"
   mkdir -p "$create_config_dir"
   mkdir -p "$create_rocksdb_dir"
@@ -64,6 +66,7 @@ sudo ./setup-remote-snapshot
 cd data
 cd snapshots
 sudo ./restore-remote-snapshot
+echo ""
 
 #----------------------------------------------------------------------------------------------------#
 # GRACEFULLY STOP REMNODE                                                                            #
@@ -330,12 +333,12 @@ systemctl restart node_shutdown
 # CLEANUP INSTALLATION FILES                                                                         #
 #----------------------------------------------------------------------------------------------------#
 
-rm /root/remprotocol
 rm /root/boost_1_70_0.tar.gz
 rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
 rm /root/remprotocol_0.4.1.amd64.deb
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
+echo ""
 
 #----------------------------------------------------------------------------------------------------#
 # CHANGING DEFAULT SSH PORT NUMBER                                                                   #
