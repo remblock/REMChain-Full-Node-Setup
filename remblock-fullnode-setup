@@ -433,7 +433,9 @@ wget https://raw.githubusercontent.com/remblock/REMChain-Full-Node-Setup/master/
 # NGINX | GET IMAGES FROM DROPBOX                                                                    #
 #----------------------------------------------------------------------------------------------------#
 
-mkdir /var/www/html/images && cd /var/www/html/images
+mkdir /var/www/html/images
+chmod 444 /var/www/html/images
+cd /var/www/html/images
 wget https://www.dropbox.com/s/efn7kwj3a6428tw/remblock_logo.svg
 wget https://www.dropbox.com/s/856hpih1kftykup/remblock_logo_256.png
 wget https://www.dropbox.com/s/f88fwq8iqzf1k66/remblock_logo_1024.png
