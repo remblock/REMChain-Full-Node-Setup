@@ -51,7 +51,7 @@ sudo ./remprotocol
 rm remprotocol
 
 #----------------------------------------------------------------------------------------------------#
-# FETCHING GENESIS JSON                                                                              #
+# FETCHING REMCHAIN GENESIS.JSON                                                                     #
 #----------------------------------------------------------------------------------------------------#
 
 wget https://remchain.remme.io/genesis.json
