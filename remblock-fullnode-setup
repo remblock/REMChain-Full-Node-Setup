@@ -245,9 +245,9 @@ echo 'server {
 listen 80;
 listen [::]:80;
 server_name bp.remblock.io;
-location = / {
-return 301 http://remblock.io;
-}
+#location = / {
+#return 301 http://remblock.io;
+#}
 root /var/www/html;
 client_max_body_size 500m;
 access_log /var/log/nginx/bp.remblock.io.access.log;
@@ -282,9 +282,9 @@ add_header  Content-Type    application/json;
 echo 'server {
 listen 443 ssl;
 server_name bp.remblock.io;
-location = / {
-return 301 https://remblock.io;
-}
+#location = / {
+#return 301 https://remblock.io;
+#}
 root /var/www/html;
 ssl on;
 ssl_certificate /etc/letsencrypt/live/bp.remblock.io/fullchain.pem;
