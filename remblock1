@@ -13,7 +13,7 @@ create_data_dir="/root/data"
 state_dir="/root/data/state"
 blocks_dir="/root/data/blocks"
 create_config_dir="/root/config"
-create_remdata_dir="/root/remdata"
+create_remcert_dir="/root/remcert"
 remnode_log_file="/root/remnode.log"
 config_file="/root/config/config.ini"
 genesis_json_file="/root/genesis.json"
@@ -25,12 +25,12 @@ create_snapshot_dir="/root/data/snapshots"
 # CREATE DIRECTORY IF IT DOESN'T EXIST                                                               #
 #----------------------------------------------------------------------------------------------------#
 
-if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_remdata_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
+if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_remcert_dir" -o -d "$create_rocksdb_dir" -o -d "$create_shpdata_dir" -o -d "$create_snapshot_dir" ]
 then
   mkdir -p "$create_ssh_dir"
   mkdir -p "$create_data_dir"
   mkdir -p "$create_config_dir"
-  mkdir -p "$create_remdata_dir"
+  mkdir -p "$create_remcert_dir"
   mkdir -p "$create_rocksdb_dir"
   mkdir -p "$create_shpdata_dir"
   mkdir -p "$create_snapshot_dir"
