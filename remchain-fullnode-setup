@@ -102,6 +102,18 @@ then
 fi
 
 #----------------------------------------------------------------------------------------------------#
+# DOMAIN | INSTALL AND INIT SSL CERTIFCATE                                                           #
+#----------------------------------------------------------------------------------------------------#
+
+cd ~
+sudo apt-get install software-properties-common -y
+sudo add-apt-repository universe
+sudo add-apt-repository ppa:certbot/certbot -y
+sudo apt-get update
+sudo apt-get install certbot -y
+sudo certbot certonly --standalone --agree-tos --noninteractive --preferred-challenges http --email $contact --domains $domain
+
+#----------------------------------------------------------------------------------------------------#
 # READJUST CONFIG.INI FILE                                                                           #
 #----------------------------------------------------------------------------------------------------#
 
@@ -109,6 +121,10 @@ cd ~
 wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
 cat /root/config.ini > /root/config/config.ini
 rm /root/config.ini
+ssl_certificate_path=$(certbot certificates | grep 'Certificate Path:' | awk '{print $3}')
+ssl_private_key_path=$(certbot certificates | grep 'Private Key Path:' | awk '{print $4}')
+echo "https-private-key-file = $ssl_private_key_path" >> /root/config/config.ini
+echo "https-certificate-chain-file = $ssl_certificate_path" >> /root/config/config.ini
 echo "" >> /root/config/config.ini
 wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
 cat /root/mainnet.ini >> /root/config/config.ini
@@ -246,21 +262,6 @@ then
     sleep 1
   done
 fi
-
-#----------------------------------------------------------------------------------------------------#
-# DOMAIN | INSTALL AND INIT SSL CERTIFCATE                                                           #
-#----------------------------------------------------------------------------------------------------#
-
-cd ~
-sudo apt-get install software-properties-common -y
-sudo add-apt-repository universe
-sudo add-apt-repository ppa:certbot/certbot -y
-sudo apt-get update
-sudo apt-get install certbot -y
-sudo certbot certonly --standalone --agree-tos --noninteractive --preferred-challenges http --email $contact --domains $domain
-sudo cp /etc/letsencrypt/live/$domain/fullchain.pem ./data/certs
-sudo cp /etc/letsencrypt/live/$domain/privkey.pem ./data/certs
-sudo chown -R root:root ./data/certs
 
 #----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
