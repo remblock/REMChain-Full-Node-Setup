@@ -231,6 +231,23 @@ exit 0' > /etc/rc.local
 sudo chmod +x /etc/rc.local
 
 #----------------------------------------------------------------------------------------------------#
+# GRACEFULLY STOP REMNODE                                                                            #
+#----------------------------------------------------------------------------------------------------#
+
+remnode_pid=$(pgrep remnode)
+
+if [ ! -z "$remnode_pid" ];
+then
+  if ps -p $remnode_pid > /dev/null;
+  then
+    kill -SIGINT $remnode_pid
+  fi
+  while ps -p $remnode_pid > /dev/null; do
+    sleep 1
+  done
+fi
+
+#----------------------------------------------------------------------------------------------------#
 # DOMAIN | INSTALL AND INIT SSL CERTIFCATE                                                           #
 #----------------------------------------------------------------------------------------------------#
 
