@@ -8,11 +8,18 @@
 # CONFIGURATION VARIABLES                                                                            #
 #----------------------------------------------------------------------------------------------------#
 
+portnumber=22
+domain="rem.remblock.io"
+contact="contact@remblock.io"
+
+#----------------------------------------------------------------------------------------------------#
+
 create_ssh_dir="/root/.ssh"
 create_data_dir="/root/data"
 state_dir="/root/data/state"
 blocks_dir="/root/data/blocks"
 create_config_dir="/root/config"
+create_certs_dir="/root/data/certs"
 remnode_log_file="/root/remnode.log"
 config_file="/root/config/config.ini"
 genesis_json_file="/root/genesis.json"
@@ -28,6 +35,7 @@ if [ ! -d "$create_data_dir" -o -d "$create_config_dir" -o -d "$create_rocksdb_d
 then
   mkdir -p "$create_ssh_dir"
   mkdir -p "$create_data_dir"
+  mkdir -p "$create_certs_dir"
   mkdir -p "$create_config_dir"
   mkdir -p "$create_rocksdb_dir"
   mkdir -p "$create_shpdata_dir"
@@ -39,6 +47,7 @@ fi
 #----------------------------------------------------------------------------------------------------#
 
 echo -e "plugin = eosio::chain_api_plugin\n\nplugin = eosio::net_api_plugin\n\nhttp-server-address = 0.0.0.0:8888\n\np2p-listen-endpoint = 0.0.0.0:9876\n\n# https://remme.io\n\np2p-peer-address = p2p.remchain.remme.io:2087\n\nverbose-http-errors = true\n\nchain-state-db-size-mb = 100480\n\nreversible-blocks-db-size-mb = 10480" > ./config/config.ini
+sudo -S sed -i "/^#Port 22/s/#Port 22/Port $portnumber/" /etc/ssh/sshd_config 
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALLING PROTOCOL BINARIES                                                                       #
@@ -229,7 +238,10 @@ sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot -y
-sudo certbot certonly --standalone --agree-tos --preferred-challenges http
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http -m $contact -d $domain
+sudo cp /etc/letsencrypt/live/$domain/fullchain.pem ./data/certs
+sudo cp /etc/letsencrypt/live/$domain/privkey.pem ./data/certs
+sudo chown -R root:root ./data/certs
 
 #----------------------------------------------------------------------------------------------------#
 # SETUP GRACEFUL SHUTDOWN                                                                            #
@@ -272,29 +284,6 @@ rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
 rm /root/eosio.cdt_1.6.2-1-ubuntu-18.04_amd64.deb
 echo ""
-
-#----------------------------------------------------------------------------------------------------#
-# CHANGING DEFAULT SSH PORT NUMBER                                                                   #
-#----------------------------------------------------------------------------------------------------#
-
-while [ : ]
-do
-
-	 read -p "PLEASE ENTER A RANDOM 5 DIGIT PORT NUMBER: " portnumber
-
-         if [[ ${#portnumber} -ne 5 ]]
-         then
-                 printf "\nERROR: PORT NUMBER SHOULD BE EXACTLY 5 DIGITS.\n\n"
-                 continue
-         elif [[ ! -z "${portnumber//[0-9]}" ]]
-         then
-                 printf "\nERROR: PORT NUMBER SHOULD CONTAIN NUMBERS ONLY.\n\n"
-                 continue
-         else
-                 sudo -S sed -i "/^#Port 22/s/#Port 22/Port $portnumber/" /etc/ssh/sshd_config 
-		 break
-         fi
-done
 
 #----------------------------------------------------------------------------------------------------#
 # INSTALLING UNCOMPLICATED FIREWALL                                                                  #
