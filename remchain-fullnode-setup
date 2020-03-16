@@ -256,7 +256,7 @@ sudo add-apt-repository universe
 sudo add-apt-repository ppa:certbot/certbot -y
 sudo apt-get update
 sudo apt-get install certbot -y
-sudo certbot certonly --standalone --agree-tos --preferred-challenges http -m $contact -d $domain
+sudo certbot certonly --standalone --agree-tos --preferred-challenges http --email $contact --domains $domain
 sudo cp /etc/letsencrypt/live/$domain/fullchain.pem ./data/certs
 sudo cp /etc/letsencrypt/live/$domain/privkey.pem ./data/certs
 sudo chown -R root:root ./data/certs
