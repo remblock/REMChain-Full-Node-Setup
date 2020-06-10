@@ -239,7 +239,6 @@ create_config_dir="/root/config"
 remnode_log_file="/root/remnode.log"
 create_shpdata_dir="/root/data/shpdata"
 
-sudo resize2fs /dev/nvme1n1
 cpupower frequency-set --governor performance
 remnode --config-dir $create_config_dir --data-dir $create_rem_dir --state-history-dir $create_shpdata_dir --disable-replay-opts >> $remnode_log_file 2>&1 &
 
