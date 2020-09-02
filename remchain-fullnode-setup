@@ -120,7 +120,6 @@ sudo certbot certonly --standalone --agree-tos --noninteractive --preferred-chal
 cd ~
 wget https://github.com/remblock/REMChain-Full-Node-Setup/raw/master/config.ini
 cat /root/config.ini > /root/config/config.ini
-rm /root/config.ini
 ssl_certificate_path=$(certbot certificates | grep 'Certificate Path:' | awk '{print $3}')
 ssl_private_key_path=$(certbot certificates | grep 'Private Key Path:' | awk '{print $4}')
 echo "https-private-key-file = $ssl_private_key_path" >> /root/config/config.ini
@@ -128,7 +127,6 @@ echo "https-certificate-chain-file = $ssl_certificate_path" >> /root/config/conf
 echo "" >> /root/config/config.ini
 wget https://raw.githubusercontent.com/remblock/REMChain-Peer-Lists/master/peer-lists/mainnet.ini
 cat /root/mainnet.ini >> /root/config/config.ini
-rm /root/mainnet.ini
 
 #----------------------------------------------------------------------------------------------------#
 # START REMNODE IN THE BACKGROUND                                                                    #
@@ -280,6 +278,8 @@ systemctl restart node_shutdown
 # CLEANUP INSTALLATION FILES                                                                         #
 #----------------------------------------------------------------------------------------------------#
 
+rm /root/config.ini
+rm /root/mainnet.ini
 rm /root/boost_1_70_0.tar.gz
 rm /root/cmake-3.14.5.tar.gz
 rm /root/setup-remote-snapshot
